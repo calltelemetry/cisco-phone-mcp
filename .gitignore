@@ -1,0 +1,19 @@
+# Node
+node_modules/
+
+# Yarn berry / PnP
+.yarn/
+.pnp.*
+
+# Build
+dist/
+
+# Logs
+*.log
+
+# Local env
+.env
+.env.*
+
+# macOS
+.DS_Store
