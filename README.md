@@ -23,6 +23,10 @@ Environment variables:
 - `PHONE_USERNAME`
 - `PHONE_PASSWORD`
 
+Docs:
+
+- `phone-mcp/docs/README.md`
+
 ## CLI quick checks
 
 ```bash

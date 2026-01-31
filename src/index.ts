@@ -177,6 +177,76 @@ server.tool(
 );
 
 server.tool(
+  "dial",
+  {
+    host: targetSchema.shape.host,
+    auth: targetSchema.shape.auth,
+    digits: z.string().min(1).describe("Digits or URI to dial (e.g. 9000)"),
+    speaker: z
+      .boolean()
+      .optional()
+      .describe("Send Key:Speaker before dialing (default: true)"),
+    path: z.string().optional().describe("Execute endpoint path (default: /CGI/Execute)"),
+  },
+  async ({ host, auth, digits, speaker, path }) => {
+    const urls: string[] = [];
+    if (speaker ?? true) {
+      urls.push("Key:Speaker");
+    }
+    urls.push(`Dial:${digits}`);
+
+    const resp = await executePhoneCommand(host, urls, auth, path || "/CGI/Execute");
+    return {
+      content: [
+        {
+          type: "text",
+          text: JSON.stringify(
+            {
+              status: resp.status,
+              executed: urls,
+              responseXml: resp.responseXml,
+            },
+            null,
+            2
+          ),
+        },
+      ],
+    };
+  }
+);
+
+server.tool(
+  "end_call",
+  {
+    host: targetSchema.shape.host,
+    auth: targetSchema.shape.auth,
+    repeat: z.number().int().min(1).max(5).optional().describe("How many EndCall presses (default: 2)"),
+    path: z.string().optional().describe("Execute endpoint path (default: /CGI/Execute)"),
+  },
+  async ({ host, auth, repeat, path }) => {
+    const r = repeat ?? 2;
+    const urls = Array.from({ length: r }, () => "Key:EndCall");
+    const resp = await executePhoneCommand(host, urls, auth, path || "/CGI/Execute");
+    return {
+      content: [
+        {
+          type: "text",
+          text: JSON.stringify(
+            {
+              status: resp.status,
+              executed: urls,
+              responseXml: resp.responseXml,
+            },
+            null,
+            2
+          ),
+        },
+      ],
+    };
+  }
+);
+
+server.tool(
   "screenshot",
   {
     host: targetSchema.shape.host,
