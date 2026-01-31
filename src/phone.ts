@@ -209,13 +209,35 @@ export async function getStreamingStatisticsStream(
   const senderOctets = asInt(extractBoldValue(resp.body, "Sender Octets"));
   const senderCodec = extractBoldValue(resp.body, "Sender Codec");
 
-  const rcvrLostPackets = asInt(extractBoldValue(resp.body, "Rcvr Lost Packets"));
+  const rcvrLostPackets = asInt(
+    pickBetween(
+      extractBoldValue(resp.body, "Rcvr Lost Packets"),
+      extractBoldValue(resp.body, "Receiver lost packets"),
+      extractBoldValue(resp.body, "Receiver Lost Packets")
+    )
+  );
   const avgJitter = asInt(extractBoldValue(resp.body, "Avg Jitter"));
   const maxJitter = asInt(extractBoldValue(resp.body, "Max Jitter"));
   const latency = asInt(extractBoldValue(resp.body, "Latency"));
-  const rcvrCodec = extractBoldValue(resp.body, "Rcvr Codec");
-  const rcvrPackets = asInt(extractBoldValue(resp.body, "Rcvr Packets"));
-  const rcvrOctets = asInt(extractBoldValue(resp.body, "Rcvr Octets"));
+  const rcvrCodec = pickBetween(
+    extractBoldValue(resp.body, "Rcvr Codec"),
+    extractBoldValue(resp.body, "Receiver codec"),
+    extractBoldValue(resp.body, "Receiver Codec")
+  );
+  const rcvrPackets = asInt(
+    pickBetween(
+      extractBoldValue(resp.body, "Rcvr Packets"),
+      extractBoldValue(resp.body, "Receiver packets"),
+      extractBoldValue(resp.body, "Receiver Packets")
+    )
+  );
+  const rcvrOctets = asInt(
+    pickBetween(
+      extractBoldValue(resp.body, "Rcvr Octets"),
+      extractBoldValue(resp.body, "Receiver octets"),
+      extractBoldValue(resp.body, "Receiver Octets")
+    )
+  );
   const rcvrDiscarded = asInt(extractBoldValue(resp.body, "Rcvr Discarded"));
 
   const mosLqk = (() => {
