@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 
 import { withMockFetch, responseBytes } from "./helpers.js";
 
-import { getScreenshot, getScreenshotAuto } from "../dist/phone.js";
+import { getScreenshot, getScreenshotAuto } from "../src/phone.js";
 
 test("phone: getScreenshot returns image bytes and content type", async () => {
   const imgBytes = new Uint8Array([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
@@ -188,7 +188,6 @@ test("phone: getScreenshotAuto retries all candidates with full auth on 401", as
   const h = withMockFetch(async ({ calls }) => {
     const res = await getScreenshotAuto("192.168.125.178", { username: "admin", password: "pass" });
     assert.equal(res.status, 200);
-    // With full auth, it should NOT break on 401 — it tries the next candidate
     assert.ok(calls.length > 1);
   });
 
@@ -205,14 +204,12 @@ test("phone: getScreenshotAuto retries all candidates with full auth on 401", as
 
 test("phone: getScreenshotAuto returns 500 when all candidates fail with status 0", async () => {
   const h = withMockFetch(async () => {
-    // No model hint → tries 4 default candidates, all return empty 200
     const res = await getScreenshotAuto("192.168.125.178", undefined, null);
     assert.equal(res.bytes.length, 0);
     assert.equal(res.attempted.length, 4);
   });
 
   await h.run(async () => {
-    // 200 but empty body — doesn't count as success
     return responseBytes(new Uint8Array(), { status: 200, headers: { "content-type": "text/plain" } });
   });
 });
@@ -240,7 +237,6 @@ test("phone: getScreenshotAuto with empty string modelHint uses default candidat
   const h = withMockFetch(async () => {
     const res = await getScreenshotAuto("192.168.125.178", undefined, "  ");
     assert.equal(res.status, 200);
-    // Empty/whitespace model hint should fall through to default candidates
     assert.ok(res.attempted.length > 0);
   });
 

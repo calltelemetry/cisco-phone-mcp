@@ -24,7 +24,7 @@ jobs:
         run: npx tsc
 
       - name: Run tests
-        run: node --test test/*.test.js
+        run: npx tsx --test test/*.test.ts
 
       - name: Publish to npm
         run: npm publish --access public

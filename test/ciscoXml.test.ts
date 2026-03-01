@@ -1,11 +1,11 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 
-import { parseCiscoXml, asString, asInt, parseIpPort } from "../dist/ciscoXml.js";
+import { parseCiscoXml, asString, asInt, parseIpPort } from "../src/ciscoXml.js";
 
 test("ciscoXml: parseCiscoXml parses simple XML", () => {
   const xml = "<Root><A>hello</A><B>123</B></Root>";
-  const parsed = parseCiscoXml(xml);
+  const parsed = parseCiscoXml(xml) as { Root: { A: string; B: string } };
   assert.equal(parsed.Root.A, "hello");
   assert.equal(parsed.Root.B, "123");
 });

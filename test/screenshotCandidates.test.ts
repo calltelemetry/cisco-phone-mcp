@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 
 import { withMockFetch, responseBytes } from "./helpers.js";
 
-import { getScreenshotAuto } from "../dist/phone.js";
+import { getScreenshotAuto } from "../src/phone.js";
 
 test("phone: getScreenshotAuto tries https first for Cisco 98xx model hint", async () => {
   const host = "192.168.125.178";

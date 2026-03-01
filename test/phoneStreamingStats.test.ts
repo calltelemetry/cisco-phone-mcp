@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 
 import { withMockFetch, responseText } from "./helpers.js";
 
-import { getStreamingStatistics, getStreamingStatisticsStream, getRtpStats } from "../dist/phone.js";
+import { getStreamingStatistics, getStreamingStatisticsStream, getRtpStats } from "../src/phone.js";
 
 test("phone: getStreamingStatistics parses StreamingStatisticsX", async () => {
   const xml = `<?xml version="1.0" encoding="utf-8"?>
@@ -35,10 +35,10 @@ test("phone: getStreamingStatistics parses StreamingStatisticsX", async () => {
     assert.equal(ss.mosLqk, 4.32);
 
     const summary = await getRtpStats("192.168.125.178");
-    assert.equal(summary.remote.host, "192.168.125.10");
-    assert.equal(summary.remote.port, 20000);
-    assert.equal(summary.local.host, "192.168.125.178");
-    assert.equal(summary.local.port, 34567);
+    assert.equal(summary.remote!.host, "192.168.125.10");
+    assert.equal(summary.remote!.port, 20000);
+    assert.equal(summary.local!.host, "192.168.125.178");
+    assert.equal(summary.local!.port, 34567);
     assert.equal(summary.rxPackets, 333);
   });
 

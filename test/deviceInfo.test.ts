@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 
 import { withMockFetch, responseText } from "./helpers.js";
 
-import { getDeviceInformation, getNetworkConfiguration, getPortInformation } from "../dist/phone.js";
+import { getDeviceInformation, getNetworkConfiguration, getPortInformation } from "../src/phone.js";
 
 test("phone: getDeviceInformation parses DeviceInformationX XML", async () => {
   const xml = `<?xml version="1.0" encoding="utf-8"?>
@@ -40,7 +40,7 @@ test("phone: getDeviceInformation throws on HTTP 400+", async () => {
   const h = withMockFetch(async () => {
     await assert.rejects(
       () => getDeviceInformation("192.168.125.178"),
-      (err) => {
+      (err: Error) => {
         assert.ok(err.message.includes("DeviceInformationX HTTP 403"));
         return true;
       }
@@ -113,7 +113,7 @@ test("phone: getNetworkConfiguration throws on HTTP 500", async () => {
   const h = withMockFetch(async () => {
     await assert.rejects(
       () => getNetworkConfiguration("192.168.125.178"),
-      (err) => {
+      (err: Error) => {
         assert.ok(err.message.includes("NetworkConfigurationX HTTP 500"));
         return true;
       }
@@ -163,7 +163,7 @@ test("phone: getPortInformation throws on HTTP 401", async () => {
   const h = withMockFetch(async () => {
     await assert.rejects(
       () => getPortInformation("192.168.125.178"),
-      (err) => {
+      (err: Error) => {
         assert.ok(err.message.includes("PortInformationX HTTP 401"));
         return true;
       }

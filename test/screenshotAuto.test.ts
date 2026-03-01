@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 
 import { withMockFetch, responseBytes } from "./helpers.js";
 
-import { getScreenshotAuto } from "../dist/phone.js";
+import { getScreenshotAuto } from "../src/phone.js";
 
 test("phone: getScreenshotAuto stops after 401 when auth missing", async () => {
   const h = withMockFetch(async ({ calls }) => {

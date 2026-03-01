@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 
 import { withMockFetch, responseText, responseBytes, parseFormBody } from "./helpers.js";
 
-import { httpPostForm, httpGetBytes, getDefaultAuth, normalizeTarget } from "../dist/http.js";
+import { httpPostForm, httpGetBytes, getDefaultAuth, normalizeTarget } from "../src/http.js";
 
 // --- httpPostForm ---
 
@@ -21,8 +21,8 @@ test("http: httpPostForm sends form-urlencoded POST with auth", async () => {
 
     const init = calls[0].init;
     assert.equal(init.method, "POST");
-    assert.ok(init.headers["content-type"].includes("application/x-www-form-urlencoded"));
-    assert.ok(init.headers.authorization.startsWith("Basic "));
+    assert.ok(init.headers?.["content-type"]?.includes("application/x-www-form-urlencoded"));
+    assert.ok(init.headers?.authorization?.startsWith("Basic "));
 
     const form = parseFormBody(init.body);
     assert.equal(form.XML, "<test>hello</test>");
@@ -35,7 +35,6 @@ test("http: httpPostForm sends form-urlencoded POST with auth", async () => {
 });
 
 test("http: httpPostForm with no auth omits authorization header", async () => {
-  // Clear env vars to ensure no default auth
   const prevUser = process.env.PHONE_USERNAME;
   const prevPass = process.env.PHONE_PASSWORD;
   const prevUser2 = process.env.PHONE_USER;
@@ -49,7 +48,7 @@ test("http: httpPostForm with no auth omits authorization header", async () => {
     const h = withMockFetch(async ({ calls }) => {
       await httpPostForm("192.168.125.178", "/test", { key: "val" });
       const init = calls[0].init;
-      assert.equal(init.headers.authorization, undefined);
+      assert.equal(init.headers?.authorization, undefined);
     });
 
     await h.run(async () => {
@@ -153,8 +152,8 @@ test("http: getDefaultAuth uses PHONE_USER/PHONE_PASS aliases", () => {
 
   try {
     const auth = getDefaultAuth();
-    assert.equal(auth.username, "altuser");
-    assert.equal(auth.password, "altpass");
+    assert.equal(auth?.username, "altuser");
+    assert.equal(auth?.password, "altpass");
   } finally {
     if (prevUser !== undefined) process.env.PHONE_USERNAME = prevUser;
     else delete process.env.PHONE_USERNAME;
@@ -170,7 +169,7 @@ test("http: getDefaultAuth uses PHONE_USER/PHONE_PASS aliases", () => {
 // --- normalizeTarget edge cases ---
 
 test("http: normalizeTarget handles PhoneTarget object passthrough", () => {
-  const target = { host: "phone.local", protocol: "https", port: 8443 };
+  const target = { host: "phone.local", protocol: "https" as const, port: 8443 };
   const result = normalizeTarget(target);
   assert.deepEqual(result, target);
 });

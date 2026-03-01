@@ -21,11 +21,14 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Typecheck
+        run: npx tsc --noEmit
+
       - name: Build
         run: npx tsc
 
       - name: Run tests with coverage
-        run: npx c8 --reporter=lcov --reporter=text node --test test/*.test.js
+        run: npx c8 --reporter=lcov --reporter=text npx tsx --test test/*.test.ts
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5

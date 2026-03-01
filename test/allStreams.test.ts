@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 
 import { withMockFetch, responseText } from "./helpers.js";
 
-import { getStreamingStatisticsAllStreams } from "../dist/phone.js";
+import { getStreamingStatisticsAllStreams } from "../src/phone.js";
 
 test("phone: getStreamingStatisticsAllStreams always returns 5 entries", async () => {
   const html0 = `<HTML><BODY><B>Stream Status</B><B>Active</B><B>Local Address</B><B>1.2.3.4/1111</B></BODY></HTML>`;

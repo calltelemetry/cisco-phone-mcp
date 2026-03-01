@@ -16,8 +16,8 @@
     "build": "tsc && chmod +x dist/index.js",
     "typecheck": "tsc --noEmit",
     "cli": "tsx src/cli.ts",
-    "test": "npm run build && node --test test/*.test.js",
-    "test:coverage": "npm run build && c8 --reporter=lcov --reporter=text node --test test/*.test.js",
+    "test": "tsx --test test/*.test.ts",
+    "test:coverage": "c8 --reporter=lcov --reporter=text tsx --test test/*.test.ts",
     "prepack": "npm run build && npm test"
   },
   "keywords": [

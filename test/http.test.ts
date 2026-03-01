@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 
 import { withMockFetch, responseText } from "./helpers.js";
 
-import { normalizeTarget, buildBaseUrl, httpGetText } from "../dist/http.js";
+import { normalizeTarget, buildBaseUrl, httpGetText } from "../src/http.js";
 
 test("http: normalizeTarget/buildBaseUrl handle scheme and port", () => {
   assert.deepEqual(normalizeTarget("192.168.1.10"), { host: "192.168.1.10", protocol: "http", port: undefined });
@@ -27,7 +27,7 @@ test("http: httpGetText uses default auth env vars when present", async () => {
     });
 
     await h.run(async (_url, init) => {
-      const headers = init.headers || {};
+      const headers = (init.headers || {}) as Record<string, string>;
       const auth = headers.authorization || headers.Authorization || headers["authorization"];
       assert.ok(auth, "Expected authorization header");
       assert.ok(String(auth).startsWith("Basic "));

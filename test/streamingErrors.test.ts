@@ -7,7 +7,7 @@ import {
   getStreamingStatistics,
   getStreamingStatisticsStream,
   getRtpStats,
-} from "../dist/phone.js";
+} from "../src/phone.js";
 
 // --- HTTP error paths ---
 
@@ -15,7 +15,7 @@ test("phone: getStreamingStatistics throws on HTTP 400+", async () => {
   const h = withMockFetch(async () => {
     await assert.rejects(
       () => getStreamingStatistics("192.168.125.178"),
-      (err) => {
+      (err: Error) => {
         assert.ok(err.message.includes("StreamingStatisticsX HTTP 403"));
         return true;
       }
@@ -31,7 +31,7 @@ test("phone: getStreamingStatisticsStream throws on HTTP 500", async () => {
   const h = withMockFetch(async () => {
     await assert.rejects(
       () => getStreamingStatisticsStream("192.168.125.178", 2),
-      (err) => {
+      (err: Error) => {
         assert.ok(err.message.includes("streaming.2 HTTP 500"));
         return true;
       }
@@ -48,7 +48,7 @@ test("phone: getStreamingStatisticsStream throws on HTTP 500", async () => {
 test("phone: getStreamingStatisticsStream rejects negative stream index", async () => {
   await assert.rejects(
     () => getStreamingStatisticsStream("192.168.125.178", -1),
-    (err) => {
+    (err: Error) => {
       assert.ok(err.message.includes("streamIndex out of range"));
       assert.ok(err.message.includes("-1"));
       return true;
@@ -59,7 +59,7 @@ test("phone: getStreamingStatisticsStream rejects negative stream index", async 
 test("phone: getStreamingStatisticsStream rejects stream index > 4", async () => {
   await assert.rejects(
     () => getStreamingStatisticsStream("192.168.125.178", 5),
-    (err) => {
+    (err: Error) => {
       assert.ok(err.message.includes("streamIndex out of range"));
       assert.ok(err.message.includes("5"));
       return true;
@@ -113,10 +113,10 @@ test("phone: getRtpStats handles null addresses when no active stream", async ()
     assert.equal(summary.rxPackets, null);
     assert.equal(summary.txPackets, null);
     assert.equal(summary.lostPackets, null);
-    assert.equal(summary.jitter.avg, null);
-    assert.equal(summary.jitter.max, null);
-    assert.equal(summary.codec.rx, null);
-    assert.equal(summary.codec.tx, null);
+    assert.equal(summary.jitter!.avg, null);
+    assert.equal(summary.jitter!.max, null);
+    assert.equal(summary.codec!.rx, null);
+    assert.equal(summary.codec!.tx, null);
     assert.equal(summary.mosLqk, null);
   });
 
@@ -209,7 +209,6 @@ test("phone: getStreamingStatisticsStream handles Receiver Packets (title case) 
 // --- extractBoldValue edge cases ---
 
 test("phone: getStreamingStatisticsStream handles missing labels gracefully", async () => {
-  // Minimal HTML with no matching labels
   const html = `<HTML><BODY><TABLE>
 <TR><TD><B>Unknown Field</B></TD><TD><B>42</B></TD></TR>
 </TABLE></BODY></HTML>`;
@@ -240,7 +239,6 @@ test("phone: getStreamingStatisticsStream handles empty bold values", async () =
 
   const h = withMockFetch(async () => {
     const ss = await getStreamingStatisticsStream("192.168.125.178", 0);
-    // Empty <B></B> and whitespace-only should return null
     assert.equal(ss.remoteAddrRaw, null);
     assert.equal(ss.streamStatus, null);
   });

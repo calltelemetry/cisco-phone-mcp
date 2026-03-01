@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 
 import { withMockFetch, responseText, parseFormBody, mustInclude } from "./helpers.js";
 
-import { executePhoneCommand } from "../dist/phone.js";
+import { executePhoneCommand } from "../src/phone.js";
 
 test("phone: executePhoneCommand sends CiscoIPPhoneExecute XML (escapes URL attr)", async () => {
   const urls = [
