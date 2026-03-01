@@ -1,16 +1,37 @@
 {
-  "name": "cisco-phone-mcp",
-  "version": "0.1.0",
-  "private": true,
+  "name": "@calltelemetry/cisco-phone-mcp",
+  "version": "0.2.0",
+  "description": "MCP server for direct Cisco IP phone control and monitoring via built-in HTTP endpoints",
   "type": "module",
+  "main": "dist/index.js",
+  "bin": "dist/index.js",
+  "files": [
+    "dist/**/*"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "start": "tsx src/index.ts",
-    "build": "tsc",
+    "build": "tsc && chmod +x dist/index.js",
     "typecheck": "tsc --noEmit",
     "cli": "tsx src/cli.ts",
-    "test": "yarn build && node --test test/*.test.js",
-    "test:coverage": "yarn build && c8 --reporter=lcov --reporter=text node --test test/*.test.js"
+    "test": "npm run build && node --test test/*.test.js",
+    "test:coverage": "npm run build && c8 --reporter=lcov --reporter=text node --test test/*.test.js",
+    "prepack": "npm run build && npm test"
   },
+  "keywords": [
+    "mcp",
+    "cisco",
+    "phone",
+    "voip",
+    "rtp",
+    "cucm",
+    "ip-phone",
+    "call-quality"
+  ],
+  "author": "CallTelemetry",
+  "license": "MIT",
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.12.1",
     "fast-xml-parser": "^4.5.3",
