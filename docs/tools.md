@@ -1,6 +1,6 @@
 # Phone MCP Tool Reference
 
-Complete reference for all MCP tools exposed by phone-mcp.
+Complete reference for all MCP tools exposed by cisco-phone-mcp.
 
 ## Common Parameters
 

@@ -310,7 +310,7 @@ echo "PHONE_PASSWORD: ${PHONE_PASSWORD:+<set>}"
 node --version
 
 # Check dependencies
-cd phone-mcp && yarn list --depth=0
+cd cisco-phone-mcp && yarn list --depth=0
 ```
 
 ## Related Documentation

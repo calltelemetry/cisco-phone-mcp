@@ -20,7 +20,7 @@ Phone MCP enables AI agents to directly control and monitor Cisco IP phones with
 │                           Phone MCP Server                               │
 │                                                                          │
 │   ┌─────────────┐     ┌─────────────┐     ┌─────────────────────────┐  │
-│   │   Claude    │     │  phone-mcp  │     │     Cisco IP Phone      │  │
+│   │   Claude    │     │  cisco-phone-mcp  │     │     Cisco IP Phone      │  │
 │   │   Code      │ ──► │             │ ──► │   Built-in HTTP Server  │  │
 │   │             │     │ MCP Server  │     │                         │  │
 │   └─────────────┘     └─────────────┘     └─────────────────────────┘  │
@@ -63,7 +63,7 @@ Phone MCP enables AI agents to directly control and monitor Cisco IP phones with
 ### Installation
 
 ```bash
-cd phone-mcp
+cd cisco-phone-mcp
 yarn install
 yarn build
 ```
@@ -97,7 +97,7 @@ Add to `.mcp.json`:
     "phone": {
       "type": "stdio",
       "command": "node",
-      "args": ["/path/to/phone-mcp/dist/index.js"],
+      "args": ["/path/to/cisco-phone-mcp/dist/index.js"],
       "env": {
         "PHONE_USERNAME": "admin",
         "PHONE_PASSWORD": "cisco123"
@@ -197,7 +197,7 @@ console.log(`Model: ${info.modelNumber}, MAC: ${info.macAddress}`);
 │                     CallTelemetry Phone Control                         │
 │                                                                          │
 │   ┌─────────────┐      ┌─────────────────┐      ┌─────────────────┐    │
-│   │  phone-mcp  │      │   jtapi-mcp     │      │  jtapi-sidecar  │    │
+│   │  cisco-phone-mcp  │      │   jtapi-mcp     │      │  jtapi-sidecar  │    │
 │   │ (Direct IP) │      │ (Via Operator)  │      │ (Java/JTAPI)    │    │
 │   └─────────────┘      └─────────────────┘      └─────────────────┘    │
 │         │                      │                        │               │

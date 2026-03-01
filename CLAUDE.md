@@ -1,4 +1,4 @@
-# CLAUDE.md - Phone MCP Server
+# CLAUDE.md - Cisco Phone MCP Server
 
 MCP server for direct Cisco IP phone interactions via built-in HTTP endpoints.
 
@@ -22,7 +22,7 @@ yarn cli rtp --host 192.168.125.178
 ## Project Structure
 
 ```
-phone-mcp/
+cisco-phone-mcp/
 ├── src/
 │   ├── index.ts          # MCP server entry point
 │   ├── phone.ts          # Phone API functions
@@ -101,7 +101,7 @@ Add to `.mcp.json`:
     "phone": {
       "type": "stdio",
       "command": "node",
-      "args": ["/path/to/phone-mcp/dist/index.js"],
+      "args": ["/path/to/cisco-phone-mcp/dist/index.js"],
       "env": {
         "PHONE_USERNAME": "admin",
         "PHONE_PASSWORD": "cisco123"

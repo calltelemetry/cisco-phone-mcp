@@ -20,8 +20,8 @@ import {
 import { httpGetText } from "./http.js";
 
 const server = new McpServer({
-  name: "phone",
-  version: "0.1.0",
+  name: "cisco-phone",
+  version: "0.1.1",
 });
 
 const authSchema = z

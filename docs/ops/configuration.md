@@ -23,7 +23,7 @@ Add to your `.mcp.json` file:
     "phone": {
       "type": "stdio",
       "command": "node",
-      "args": ["/path/to/phone-mcp/dist/index.js"],
+      "args": ["/path/to/cisco-phone-mcp/dist/index.js"],
       "env": {
         "PHONE_USERNAME": "admin",
         "PHONE_PASSWORD": "cisco123"
@@ -43,7 +43,7 @@ For different phone environments, create separate MCP server entries:
     "phone-lab": {
       "type": "stdio",
       "command": "node",
-      "args": ["/path/to/phone-mcp/dist/index.js"],
+      "args": ["/path/to/cisco-phone-mcp/dist/index.js"],
       "env": {
         "PHONE_USERNAME": "lab-admin",
         "PHONE_PASSWORD": "labpass"
@@ -52,7 +52,7 @@ For different phone environments, create separate MCP server entries:
     "phone-prod": {
       "type": "stdio",
       "command": "node",
-      "args": ["/path/to/phone-mcp/dist/index.js"],
+      "args": ["/path/to/cisco-phone-mcp/dist/index.js"],
       "env": {
         "PHONE_USERNAME": "prod-admin",
         "PHONE_PASSWORD": "prodpass"
@@ -101,7 +101,7 @@ For phone web access to work:
 
 ### Network Requirements
 
-- Phone must be reachable from the host running phone-mcp
+- Phone must be reachable from the host running cisco-phone-mcp
 - HTTP (port 80) or HTTPS (port 443) access
 - No firewall blocking phone web ports
 
@@ -111,7 +111,7 @@ For phone web access to work:
 
 ```json
 {
-  "name": "phone-mcp",
+  "name": "cisco-phone-mcp",
   "type": "module",
   "version": "0.1.0",
   "scripts": {
