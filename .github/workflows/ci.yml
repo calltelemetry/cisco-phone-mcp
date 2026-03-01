@@ -13,26 +13,19 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Enable Corepack
-        run: corepack enable
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: yarn
 
       - name: Install dependencies
-        run: yarn install --immutable
-
-      - name: Type check
-        run: yarn typecheck
+        run: npm install
 
       - name: Build
-        run: yarn build
+        run: npx tsc
 
       - name: Run tests with coverage
-        run: yarn c8 --reporter=lcov --reporter=text node --test test/*.test.js
+        run: npx c8 --reporter=lcov --reporter=text node --test test/*.test.js
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v5

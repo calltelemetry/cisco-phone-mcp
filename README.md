@@ -1,5 +1,8 @@
 # cisco-phone-mcp
 
+[![CI](https://github.com/calltelemetry/cisco-phone-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/calltelemetry/cisco-phone-mcp/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/calltelemetry/cisco-phone-mcp/graph/badge.svg)](https://codecov.io/gh/calltelemetry/cisco-phone-mcp)
+
 MCP server for direct Cisco IP phone control and monitoring via built-in HTTP endpoints.
 
 Gives AI agents (Claude Code, etc.) the ability to dial numbers, capture screenshots, read RTP call-quality stats, and query device/network information from any CUCM-managed Cisco IP phone — no JTAPI or CUCM admin access required.
