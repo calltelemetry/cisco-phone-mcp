@@ -22,14 +22,16 @@ Exposes 14 tools for phone control, monitoring, and diagnostics:
 
 ## Installation
 
-```bash
-npm install -g @calltelemetry/cisco-phone-mcp
-```
-
-Or with npx (no install):
+No install required — run directly with npx:
 
 ```bash
 npx @calltelemetry/cisco-phone-mcp
+```
+
+Or install globally:
+
+```bash
+npm install -g @calltelemetry/cisco-phone-mcp
 ```
 
 ## Quick Start
@@ -218,16 +220,13 @@ The server communicates directly with phones over HTTP (or HTTPS for 98xx). No C
 
 ## CLI Testing
 
-A built-in CLI is included for quick manual checks:
+A built-in CLI is included for quick manual checks (from source checkout):
 
 ```bash
-npx @calltelemetry/cisco-phone-mcp    # Not used for CLI — see below
-
-# From source:
-yarn cli device --host 192.168.1.100
-yarn cli network --host 192.168.1.100
-yarn cli port --host 192.168.1.100
-yarn cli rtp --host 192.168.1.100
+npx tsx src/cli.ts device --host 192.168.1.100
+npx tsx src/cli.ts network --host 192.168.1.100
+npx tsx src/cli.ts port --host 192.168.1.100
+npx tsx src/cli.ts rtp --host 192.168.1.100
 ```
 
 ## Development
