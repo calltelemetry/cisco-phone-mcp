@@ -1,8 +1,10 @@
 # cisco-phone-mcp
 
 [![CI](https://github.com/calltelemetry/cisco-phone-mcp/actions/workflows/ci.yml/badge.svg)](https://github.com/calltelemetry/cisco-phone-mcp/actions/workflows/ci.yml)
-[![codecov](https://codecov.io/gh/calltelemetry/cisco-phone-mcp/graph/badge.svg)](https://codecov.io/gh/calltelemetry/cisco-phone-mcp)
+[![codecov](https://codecov.io/gh/calltelemetry/cisco-phone-mcp/graph/badge.svg?token=N79BWBMEGZ)](https://codecov.io/gh/calltelemetry/cisco-phone-mcp)
 [![npm](https://img.shields.io/npm/v/@calltelemetry/cisco-phone-mcp)](https://www.npmjs.com/package/@calltelemetry/cisco-phone-mcp)
+
+Built by [Call Telemetry](https://calltelemetry.com) — realtime tools for Cisco Collaboration.
 
 An [MCP](https://modelcontextprotocol.io/) server that gives AI assistants direct control of Cisco IP phones via their built-in HTTP endpoints.
 
