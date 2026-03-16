@@ -17,7 +17,7 @@ __metadata:
   resolution: "@calltelemetry/cisco-phone-mcp@workspace:."
   dependencies:
     "@modelcontextprotocol/sdk": "npm:^1.27.1"
-    "@types/node": "npm:^25.4.0"
+    "@types/node": "npm:^25.5.0"
     c8: "npm:^11.0.0"
     fast-xml-parser: "npm:^4.5.4"
     tsx: "npm:^4.21.0"
@@ -330,7 +330,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:^25.4.0":
+"@types/node@npm:^25.5.0":
   version: 25.5.0
   resolution: "@types/node@npm:25.5.0"
   dependencies:
