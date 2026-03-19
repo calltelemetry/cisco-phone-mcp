@@ -1,6 +1,6 @@
 {
   "name": "@calltelemetry/cisco-phone-mcp",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "MCP server for direct Cisco IP phone control and monitoring via built-in HTTP endpoints",
   "type": "module",
   "main": "dist/index.js",

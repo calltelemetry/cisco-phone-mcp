@@ -1,6 +1,7 @@
 import { parseCiscoXml, asString, asInt, parseIpPort } from "./ciscoXml.js";
 import { httpGetText, httpPostForm, httpGetBytes, type PhoneAuth } from "./http.js";
 import { getCachedCapabilities } from "./discovery.js";
+import { log } from "./logger.js";
 
 export interface DeviceInformation {
   hostName?: string | null;
@@ -76,94 +77,130 @@ function top(obj: unknown): Record<string, unknown> {
   return {};
 }
 
-export async function getDeviceInformation(host: string, auth?: PhoneAuth): Promise<DeviceInformation> {
-  const resp = await httpGetText(host, "/DeviceInformationX", { auth });
-  if (resp.status >= 400) {
-    throw new Error(`DeviceInformationX HTTP ${resp.status}`);
+export async function getDeviceInformation(host: string, auth?: PhoneAuth, reqId?: string): Promise<DeviceInformation> {
+  const start = Date.now();
+  log.info("phone_op_start", { op: "getDeviceInformation", host, ...(reqId ? { reqId } : {}) });
+  try {
+    const resp = await httpGetText(host, "/DeviceInformationX", { auth, reqId });
+    if (resp.status >= 400) {
+      throw new Error(`DeviceInformationX HTTP ${resp.status}`);
+    }
+    const parsed = top(parseCiscoXml(resp.body));
+    const di = top(parsed["DeviceInformation"]);
+    const result = {
+      hostName: asString(di["HostName"]),
+      phoneDn: asString(di["phoneDN"]),
+      macAddress: asString(di["MACAddress"]),
+      serialNumber: asString(di["serialNumber"]),
+      modelNumber: asString(di["modelNumber"]),
+      versionId: asString(di["versionID"]),
+      appLoadId: asString(di["appLoadID"]),
+    };
+    log.info("phone_op_complete", { op: "getDeviceInformation", host, durationMs: Date.now() - start, success: true, ...(reqId ? { reqId } : {}) });
+    return result;
+  } catch (err) {
+    log.error("phone_op_complete", { op: "getDeviceInformation", host, durationMs: Date.now() - start, success: false, error: err instanceof Error ? err.message : String(err), ...(reqId ? { reqId } : {}) });
+    throw err;
   }
-  const parsed = top(parseCiscoXml(resp.body));
-  const di = top(parsed["DeviceInformation"]);
-  return {
-    hostName: asString(di["HostName"]),
-    phoneDn: asString(di["phoneDN"]),
-    macAddress: asString(di["MACAddress"]),
-    serialNumber: asString(di["serialNumber"]),
-    modelNumber: asString(di["modelNumber"]),
-    versionId: asString(di["versionID"]),
-    appLoadId: asString(di["appLoadID"]),
-  };
 }
 
-export async function getNetworkConfiguration(host: string, auth?: PhoneAuth): Promise<NetworkConfiguration> {
-  const resp = await httpGetText(host, "/NetworkConfigurationX", { auth });
-  if (resp.status >= 400) {
-    throw new Error(`NetworkConfigurationX HTTP ${resp.status}`);
+export async function getNetworkConfiguration(host: string, auth?: PhoneAuth, reqId?: string): Promise<NetworkConfiguration> {
+  const start = Date.now();
+  log.info("phone_op_start", { op: "getNetworkConfiguration", host, ...(reqId ? { reqId } : {}) });
+  try {
+    const resp = await httpGetText(host, "/NetworkConfigurationX", { auth, reqId });
+    if (resp.status >= 400) {
+      throw new Error(`NetworkConfigurationX HTTP ${resp.status}`);
+    }
+    const parsed = top(parseCiscoXml(resp.body));
+    const nc = top(parsed["NetworkConfiguration"]);
+    const result = {
+      hostName: asString(nc["HostName"]),
+      ipAddress: asString(nc["IPAddress"]),
+      subNetMask: asString(nc["SubNetMask"]),
+      defaultRouter1: asString(nc["DefaultRouter1"]),
+      domainName: asString(nc["DomainName"]),
+      dnsServer1: asString(nc["DNSServer1"]),
+      dnsServer2: asString(nc["DNSServer2"]),
+      tftpServer1: asString(nc["TFTPServer1"]),
+      callManager1: asString(nc["CallManager1"]),
+    };
+    log.info("phone_op_complete", { op: "getNetworkConfiguration", host, durationMs: Date.now() - start, success: true, ...(reqId ? { reqId } : {}) });
+    return result;
+  } catch (err) {
+    log.error("phone_op_complete", { op: "getNetworkConfiguration", host, durationMs: Date.now() - start, success: false, error: err instanceof Error ? err.message : String(err), ...(reqId ? { reqId } : {}) });
+    throw err;
   }
-  const parsed = top(parseCiscoXml(resp.body));
-  const nc = top(parsed["NetworkConfiguration"]);
-  return {
-    hostName: asString(nc["HostName"]),
-    ipAddress: asString(nc["IPAddress"]),
-    subNetMask: asString(nc["SubNetMask"]),
-    defaultRouter1: asString(nc["DefaultRouter1"]),
-    domainName: asString(nc["DomainName"]),
-    dnsServer1: asString(nc["DNSServer1"]),
-    dnsServer2: asString(nc["DNSServer2"]),
-    tftpServer1: asString(nc["TFTPServer1"]),
-    callManager1: asString(nc["CallManager1"]),
-  };
 }
 
-export async function getPortInformation(host: string, auth?: PhoneAuth): Promise<PortInformation> {
-  const resp = await httpGetText(host, "/PortInformationX", { auth });
-  if (resp.status >= 400) {
-    throw new Error(`PortInformationX HTTP ${resp.status}`);
+export async function getPortInformation(host: string, auth?: PhoneAuth, reqId?: string): Promise<PortInformation> {
+  const start = Date.now();
+  log.info("phone_op_start", { op: "getPortInformation", host, ...(reqId ? { reqId } : {}) });
+  try {
+    const resp = await httpGetText(host, "/PortInformationX", { auth, reqId });
+    if (resp.status >= 400) {
+      throw new Error(`PortInformationX HTTP ${resp.status}`);
+    }
+    const parsed = top(parseCiscoXml(resp.body));
+    const pi = top(parsed["PortInformation"]);
+    const result = {
+      portSpeed: asString(pi["PortSpeed"]),
+      cdpNeighborDeviceId: asString(pi["CDPNeighborDeviceId"]),
+      cdpNeighborIp: asString(pi["CDPNeighborIP"]),
+      cdpNeighborPort: asString(pi["CDPNeighborPort"]),
+      lldpNeighborDeviceId: asString(pi["LLDPNeighborDeviceId"]),
+      lldpNeighborIp: asString(pi["LLDPNeighborIP"]),
+      lldpNeighborPort: asString(pi["LLDPNeighborPort"]),
+    };
+    log.info("phone_op_complete", { op: "getPortInformation", host, durationMs: Date.now() - start, success: true, ...(reqId ? { reqId } : {}) });
+    return result;
+  } catch (err) {
+    log.error("phone_op_complete", { op: "getPortInformation", host, durationMs: Date.now() - start, success: false, error: err instanceof Error ? err.message : String(err), ...(reqId ? { reqId } : {}) });
+    throw err;
   }
-  const parsed = top(parseCiscoXml(resp.body));
-  const pi = top(parsed["PortInformation"]);
-  return {
-    portSpeed: asString(pi["PortSpeed"]),
-    cdpNeighborDeviceId: asString(pi["CDPNeighborDeviceId"]),
-    cdpNeighborIp: asString(pi["CDPNeighborIP"]),
-    cdpNeighborPort: asString(pi["CDPNeighborPort"]),
-    lldpNeighborDeviceId: asString(pi["LLDPNeighborDeviceId"]),
-    lldpNeighborIp: asString(pi["LLDPNeighborIP"]),
-    lldpNeighborPort: asString(pi["LLDPNeighborPort"]),
-  };
 }
 
-export async function getStreamingStatistics(host: string, auth?: PhoneAuth): Promise<StreamingStatistics> {
-  const resp = await httpGetText(host, "/StreamingStatisticsX", { auth });
-  if (resp.status >= 400) {
-    throw new Error(`StreamingStatisticsX HTTP ${resp.status}`);
+export async function getStreamingStatistics(host: string, auth?: PhoneAuth, reqId?: string): Promise<StreamingStatistics> {
+  const start = Date.now();
+  log.info("phone_op_start", { op: "getStreamingStatistics", host, ...(reqId ? { reqId } : {}) });
+  try {
+    const resp = await httpGetText(host, "/StreamingStatisticsX", { auth, reqId });
+    if (resp.status >= 400) {
+      throw new Error(`StreamingStatisticsX HTTP ${resp.status}`);
+    }
+    const parsed = top(parseCiscoXml(resp.body));
+    const ss = top(parsed["StreamingStatistics"]);
+    const result = {
+      remoteAddrRaw: asString(ss["RemoteAddr"]),
+      localAddrRaw: asString(ss["LocalAddr"]),
+      streamStatus: asString(ss["StreamStatus"]),
+      name: asString(ss["Name"]),
+      senderPackets: asInt(ss["SenderPackets"]),
+      senderOctets: asInt(ss["SenderOctets"]),
+      senderCodec: asString(ss["SenderCodec"]),
+      rcvrPackets: asInt(ss["RcvrPackets"]),
+      rcvrOctets: asInt(ss["RcvrOctets"]),
+      rcvrCodec: asString(ss["RcvrCodec"]),
+      rcvrLostPackets: asInt(ss["RcvrLostPackets"]),
+      avgJitter: asInt(ss["AvgJitter"]),
+      maxJitter: asInt(ss["MaxJitter"]),
+      latency: asInt(ss["Latency"]),
+      mosLqk: (() => {
+        const v = asString(ss["MOSLQK"]);
+        if (!v) return null;
+        const n = Number.parseFloat(v);
+        return Number.isFinite(n) ? n : null;
+      })(),
+      rcvrDiscarded: asInt(ss["RcvrDiscarded"]),
+      senderJoins: asInt(ss["SenderJoins"]),
+      byes: asInt(ss["Byes"]),
+    };
+    log.info("phone_op_complete", { op: "getStreamingStatistics", host, durationMs: Date.now() - start, success: true, ...(reqId ? { reqId } : {}) });
+    return result;
+  } catch (err) {
+    log.error("phone_op_complete", { op: "getStreamingStatistics", host, durationMs: Date.now() - start, success: false, error: err instanceof Error ? err.message : String(err), ...(reqId ? { reqId } : {}) });
+    throw err;
   }
-  const parsed = top(parseCiscoXml(resp.body));
-  const ss = top(parsed["StreamingStatistics"]);
-  return {
-    remoteAddrRaw: asString(ss["RemoteAddr"]),
-    localAddrRaw: asString(ss["LocalAddr"]),
-    streamStatus: asString(ss["StreamStatus"]),
-    name: asString(ss["Name"]),
-    senderPackets: asInt(ss["SenderPackets"]),
-    senderOctets: asInt(ss["SenderOctets"]),
-    senderCodec: asString(ss["SenderCodec"]),
-    rcvrPackets: asInt(ss["RcvrPackets"]),
-    rcvrOctets: asInt(ss["RcvrOctets"]),
-    rcvrCodec: asString(ss["RcvrCodec"]),
-    rcvrLostPackets: asInt(ss["RcvrLostPackets"]),
-    avgJitter: asInt(ss["AvgJitter"]),
-    maxJitter: asInt(ss["MaxJitter"]),
-    latency: asInt(ss["Latency"]),
-    mosLqk: (() => {
-      const v = asString(ss["MOSLQK"]);
-      if (!v) return null;
-      const n = Number.parseFloat(v);
-      return Number.isFinite(n) ? n : null;
-    })(),
-    rcvrDiscarded: asInt(ss["RcvrDiscarded"]),
-    senderJoins: asInt(ss["SenderJoins"]),
-    byes: asInt(ss["Byes"]),
-  };
 }
 
 function pickBetween(...vals: Array<string | null | undefined>): string | null {

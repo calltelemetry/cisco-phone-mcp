@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<DeviceInformation>
+  <HostName>SEP001122334455</HostName>
+  <phoneDN>1001</phoneDN>
+  <MACAddress>00:11:22:33:44:55</MACAddress>
+  <serialNumber>FCH1234ABCD</serialNumber>
+  <modelNumber>CP-8841</modelNumber>
+  <versionID>sip88xx.12-5-1SR3-74</versionID>
+  <appLoadID>sip88xx.12-5-1SR3-74</appLoadID>
+</DeviceInformation>

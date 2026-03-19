@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<StreamingStatistics>
+  <RemoteAddr>192.168.125.10/20000</RemoteAddr>
+  <LocalAddr>192.168.125.178/34567</LocalAddr>
+  <StreamStatus>Active</StreamStatus>
+  <Name>SEP001122334455</Name>
+  <SenderPackets>111</SenderPackets>
+  <SenderOctets>222</SenderOctets>
+  <SenderCodec>G711u</SenderCodec>
+  <RcvrPackets>333</RcvrPackets>
+  <RcvrOctets>444</RcvrOctets>
+  <RcvrCodec>G711u</RcvrCodec>
+  <RcvrLostPackets>5</RcvrLostPackets>
+  <AvgJitter>1</AvgJitter>
+  <MaxJitter>9</MaxJitter>
+  <Latency>10</Latency>
+  <MOSLQK>4.32</MOSLQK>
+  <RcvrDiscarded>0</RcvrDiscarded>
+  <SenderJoins>1</SenderJoins>
+  <Byes>0</Byes>
+</StreamingStatistics>

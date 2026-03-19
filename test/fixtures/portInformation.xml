@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PortInformation>
+  <PortSpeed>1000-Full</PortSpeed>
+  <CDPNeighborDeviceId>switch01.example.com</CDPNeighborDeviceId>
+  <CDPNeighborIP>192.168.125.1</CDPNeighborIP>
+  <CDPNeighborPort>GigabitEthernet1/0/5</CDPNeighborPort>
+  <LLDPNeighborDeviceId>switch01</LLDPNeighborDeviceId>
+  <LLDPNeighborIP>192.168.125.1</LLDPNeighborIP>
+  <LLDPNeighborPort>Gi1/0/5</LLDPNeighborPort>
+</PortInformation>

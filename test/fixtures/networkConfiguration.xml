@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<NetworkConfiguration>
+  <HostName>SEP001122334455</HostName>
+  <IPAddress>192.168.125.178</IPAddress>
+  <SubNetMask>255.255.255.0</SubNetMask>
+  <DefaultRouter1>192.168.125.1</DefaultRouter1>
+  <DomainName>example.com</DomainName>
+  <DNSServer1>8.8.8.8</DNSServer1>
+  <DNSServer2>8.8.4.4</DNSServer2>
+  <TFTPServer1>192.168.125.10</TFTPServer1>
+  <CallManager1>192.168.125.10</CallManager1>
+</NetworkConfiguration>
