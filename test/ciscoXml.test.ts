@@ -46,7 +46,8 @@ test("ciscoXml: parseCiscoXml parses PortInformation fixture", () => {
 
 test("ciscoXml: parseCiscoXml handles empty XML string", () => {
   const parsed = parseCiscoXml("");
-  assert.equal(parsed, "");
+  // fast-xml-parser returns an empty object for empty input
+  assert.deepEqual(parsed, {});
 });
 
 test("ciscoXml: parseCiscoXml handles malformed XML gracefully", () => {

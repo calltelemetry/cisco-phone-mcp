@@ -36,12 +36,14 @@ test("phone: getDeviceInformation parses DeviceInformationX XML", async () => {
   });
 });
 
-test("phone: getDeviceInformation throws on HTTP 400+", async () => {
+test("phone: getDeviceInformation throws on HTTP 403", async () => {
   const h = withMockFetch(async () => {
     await assert.rejects(
       () => getDeviceInformation("192.168.125.178"),
-      (err: Error) => {
-        assert.ok(err.message.includes("DeviceInformationX HTTP 403"));
+      (err: any) => {
+        assert.equal(err.name, "PhoneAuthError");
+        assert.equal(err.code, "PHONE_AUTH");
+        assert.equal(err.statusCode, 403);
         return true;
       }
     );
@@ -113,8 +115,10 @@ test("phone: getNetworkConfiguration throws on HTTP 500", async () => {
   const h = withMockFetch(async () => {
     await assert.rejects(
       () => getNetworkConfiguration("192.168.125.178"),
-      (err: Error) => {
-        assert.ok(err.message.includes("NetworkConfigurationX HTTP 500"));
+      (err: any) => {
+        assert.equal(err.name, "PhoneCommandError");
+        assert.equal(err.code, "PHONE_COMMAND");
+        assert.equal(err.statusCode, 500);
         return true;
       }
     );
@@ -163,8 +167,10 @@ test("phone: getPortInformation throws on HTTP 401", async () => {
   const h = withMockFetch(async () => {
     await assert.rejects(
       () => getPortInformation("192.168.125.178"),
-      (err: Error) => {
-        assert.ok(err.message.includes("PortInformationX HTTP 401"));
+      (err: any) => {
+        assert.equal(err.name, "PhoneAuthError");
+        assert.equal(err.code, "PHONE_AUTH");
+        assert.equal(err.statusCode, 401);
         return true;
       }
     );

@@ -9,28 +9,34 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [20, 22]
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup Node.js
+      - name: Setup Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: ${{ matrix.node-version }}
+
+      - name: Enable Corepack
+        run: corepack enable
 
       - name: Install dependencies
-        run: npm install
+        run: yarn install --immutable
 
-      - name: Typecheck
-        run: npx tsc --noEmit
-
-      - name: Build
-        run: npx tsc
+      - name: Type check
+        run: yarn typecheck
 
       - name: Run tests with coverage
-        run: npx c8 --reporter=lcov --reporter=text npx tsx --test test/*.test.ts
+        run: yarn test:coverage
 
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v5
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
         with:
-          token: ${{ secrets.CODECOV_TOKEN }}
+          name: coverage-node-${{ matrix.node-version }}
+          path: coverage/
+          retention-days: 14

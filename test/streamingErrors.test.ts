@@ -11,12 +11,14 @@ import {
 
 // --- HTTP error paths ---
 
-test("phone: getStreamingStatistics throws on HTTP 400+", async () => {
+test("phone: getStreamingStatistics throws on HTTP 403", async () => {
   const h = withMockFetch(async () => {
     await assert.rejects(
       () => getStreamingStatistics("192.168.125.178"),
-      (err: Error) => {
-        assert.ok(err.message.includes("StreamingStatisticsX HTTP 403"));
+      (err: any) => {
+        assert.equal(err.name, "PhoneAuthError");
+        assert.equal(err.code, "PHONE_AUTH");
+        assert.equal(err.statusCode, 403);
         return true;
       }
     );
@@ -31,8 +33,10 @@ test("phone: getStreamingStatisticsStream throws on HTTP 500", async () => {
   const h = withMockFetch(async () => {
     await assert.rejects(
       () => getStreamingStatisticsStream("192.168.125.178", 2),
-      (err: Error) => {
-        assert.ok(err.message.includes("streaming.2 HTTP 500"));
+      (err: any) => {
+        assert.equal(err.name, "PhoneCommandError");
+        assert.equal(err.code, "PHONE_COMMAND");
+        assert.equal(err.statusCode, 500);
         return true;
       }
     );
