@@ -16,12 +16,27 @@ import {
   executePhoneCommand,
   getScreenshot,
   getScreenshotAuto,
+  validateDialString,
+  holdResume,
+  transfer,
+  conference,
+  muteToggle,
+  volumeUp,
+  volumeDown,
+  speakerToggle,
+  headsetToggle,
+  navUp,
+  navDown,
+  navLeft,
+  navRight,
+  navSelect,
 } from "./phone.js";
 import { httpGetText } from "./http.js";
+import { discoverPhone } from "./discovery.js";
 
 const server = new McpServer({
   name: "cisco-phone",
-  version: "0.2.0",
+  version: "0.3.0",
 });
 
 const authSchema = z
@@ -60,6 +75,18 @@ server.tool(
         },
       ],
     };
+  }
+);
+
+server.tool(
+  "discover",
+  {
+    host: targetSchema.shape.host,
+    auth: targetSchema.shape.auth,
+  },
+  async ({ host, auth }) => {
+    const caps = await discoverPhone(host, auth);
+    return { content: [{ type: "text", text: JSON.stringify(caps, null, 2) }] };
   }
 );
 
@@ -189,11 +216,12 @@ server.tool(
     path: z.string().optional().describe("Execute endpoint path (default: /CGI/Execute)"),
   },
   async ({ host, auth, digits, speaker, path }) => {
+    const validated = validateDialString(digits);
     const urls: string[] = [];
     if (speaker ?? true) {
       urls.push("Key:Speaker");
     }
-    urls.push(`Dial:${digits}`);
+    urls.push(`Dial:${validated}`);
 
     const resp = await executePhoneCommand(host, urls, auth, path || "/CGI/Execute");
     return {
@@ -243,6 +271,119 @@ server.tool(
         },
       ],
     };
+  }
+);
+
+// ── Call control tools ───────────────────────────────────────────────
+
+function simpleKeyResult(resp: { status: number; responseXml: string }) {
+  return {
+    content: [
+      {
+        type: "text" as const,
+        text: JSON.stringify({ status: resp.status, responseXml: resp.responseXml }, null, 2),
+      },
+    ],
+  };
+}
+
+server.tool(
+  "hold_resume",
+  "Toggle hold on the active call",
+  {
+    host: targetSchema.shape.host,
+    auth: targetSchema.shape.auth,
+  },
+  async ({ host, auth }) => simpleKeyResult(await holdResume(host, auth))
+);
+
+server.tool(
+  "transfer",
+  "Initiate attended transfer on active call",
+  {
+    host: targetSchema.shape.host,
+    auth: targetSchema.shape.auth,
+  },
+  async ({ host, auth }) => simpleKeyResult(await transfer(host, auth))
+);
+
+server.tool(
+  "conference",
+  "Add a party to conference call",
+  {
+    host: targetSchema.shape.host,
+    auth: targetSchema.shape.auth,
+  },
+  async ({ host, auth }) => simpleKeyResult(await conference(host, auth))
+);
+
+server.tool(
+  "mute",
+  "Toggle microphone mute",
+  {
+    host: targetSchema.shape.host,
+    auth: targetSchema.shape.auth,
+  },
+  async ({ host, auth }) => simpleKeyResult(await muteToggle(host, auth))
+);
+
+server.tool(
+  "volume_up",
+  "Increase speaker volume",
+  {
+    host: targetSchema.shape.host,
+    auth: targetSchema.shape.auth,
+  },
+  async ({ host, auth }) => simpleKeyResult(await volumeUp(host, auth))
+);
+
+server.tool(
+  "volume_down",
+  "Decrease speaker volume",
+  {
+    host: targetSchema.shape.host,
+    auth: targetSchema.shape.auth,
+  },
+  async ({ host, auth }) => simpleKeyResult(await volumeDown(host, auth))
+);
+
+server.tool(
+  "speaker",
+  "Toggle speakerphone",
+  {
+    host: targetSchema.shape.host,
+    auth: targetSchema.shape.auth,
+  },
+  async ({ host, auth }) => simpleKeyResult(await speakerToggle(host, auth))
+);
+
+server.tool(
+  "headset",
+  "Toggle headset mode",
+  {
+    host: targetSchema.shape.host,
+    auth: targetSchema.shape.auth,
+  },
+  async ({ host, auth }) => simpleKeyResult(await headsetToggle(host, auth))
+);
+
+server.tool(
+  "navigate",
+  "Navigate phone menu (up/down/left/right/select)",
+  {
+    host: targetSchema.shape.host,
+    auth: targetSchema.shape.auth,
+    direction: z.enum(["up", "down", "left", "right", "select"]).describe("Navigation direction"),
+  },
+  async ({ host, auth, direction }) => {
+    const navFns = {
+      up: navUp,
+      down: navDown,
+      left: navLeft,
+      right: navRight,
+      select: navSelect,
+    } as const;
+    return simpleKeyResult(await navFns[direction](host, auth));
   }
 );
 

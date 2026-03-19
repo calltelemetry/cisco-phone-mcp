@@ -1,5 +1,6 @@
 import { parseCiscoXml, asString, asInt, parseIpPort } from "./ciscoXml.js";
 import { httpGetText, httpPostForm, httpGetBytes, type PhoneAuth } from "./http.js";
+import { getCachedCapabilities } from "./discovery.js";
 
 export interface DeviceInformation {
   hostName?: string | null;
@@ -269,15 +270,16 @@ export async function getStreamingStatisticsStream(
 }
 
 export async function getStreamingStatisticsAllStreams(host: string, auth?: PhoneAuth): Promise<StreamingStatisticsStream[]> {
-  const out: StreamingStatisticsStream[] = [];
-  for (let i = 0; i < 5; i++) {
-    try {
-      out.push(await getStreamingStatisticsStream(host, i, auth));
-    } catch (e) {
-      out.push({ streamIndex: i, streamStatus: "ERROR", localAddrRaw: null, remoteAddrRaw: null });
+  const indices = [0, 1, 2, 3, 4];
+  const results = await Promise.allSettled(
+    indices.map((i) => getStreamingStatisticsStream(host, i, auth))
+  );
+  return results.map((result, i) => {
+    if (result.status === "fulfilled") {
+      return result.value;
     }
-  }
-  return out;
+    return { streamIndex: i, streamStatus: "ERROR", localAddrRaw: null, remoteAddrRaw: null } as StreamingStatisticsStream;
+  });
 }
 
 export async function getRtpStats(host: string, auth?: PhoneAuth): Promise<RtpStatsSummary> {
@@ -317,6 +319,82 @@ function escapeXmlAttr(v: string): string {
     .replaceAll("\"", "&quot;")
     .replaceAll("<", "&lt;")
     .replaceAll(">", "&gt;");
+}
+
+// ── Dial validation ──────────────────────────────────────────────────
+
+const VALID_DIAL_RE = /^[0-9*#+,a-zA-Z@.\-:]+$/;
+
+export function validateDialString(digits: string): string {
+  const trimmed = digits.trim();
+  if (trimmed.length === 0) {
+    throw new Error("Dial string must not be empty");
+  }
+  if (!VALID_DIAL_RE.test(trimmed)) {
+    throw new Error(
+      `Dial string contains invalid characters: ${trimmed}. Allowed: 0-9, *, #, +, comma, letters (for URI dialing)`
+    );
+  }
+  if (trimmed.length > 30) {
+    console.warn(`[cisco-phone] Warning: suspiciously long dial string (${trimmed.length} chars): ${trimmed}`);
+  }
+  return trimmed;
+}
+
+// ── Call control helpers ─────────────────────────────────────────────
+
+export type ExecuteResult = { status: number; responseXml: string };
+
+export async function holdResume(host: string, auth?: PhoneAuth): Promise<ExecuteResult> {
+  return executePhoneCommand(host, ["Key:Hold"], auth);
+}
+
+export async function transfer(host: string, auth?: PhoneAuth): Promise<ExecuteResult> {
+  return executePhoneCommand(host, ["Key:Trnsfer"], auth);
+}
+
+export async function conference(host: string, auth?: PhoneAuth): Promise<ExecuteResult> {
+  return executePhoneCommand(host, ["Key:Confrn"], auth);
+}
+
+export async function muteToggle(host: string, auth?: PhoneAuth): Promise<ExecuteResult> {
+  return executePhoneCommand(host, ["Key:Mute"], auth);
+}
+
+export async function volumeUp(host: string, auth?: PhoneAuth): Promise<ExecuteResult> {
+  return executePhoneCommand(host, ["Key:VolUp"], auth);
+}
+
+export async function volumeDown(host: string, auth?: PhoneAuth): Promise<ExecuteResult> {
+  return executePhoneCommand(host, ["Key:VolDwn"], auth);
+}
+
+export async function speakerToggle(host: string, auth?: PhoneAuth): Promise<ExecuteResult> {
+  return executePhoneCommand(host, ["Key:Speaker"], auth);
+}
+
+export async function headsetToggle(host: string, auth?: PhoneAuth): Promise<ExecuteResult> {
+  return executePhoneCommand(host, ["Key:Headset"], auth);
+}
+
+export async function navUp(host: string, auth?: PhoneAuth): Promise<ExecuteResult> {
+  return executePhoneCommand(host, ["Key:NavUp"], auth);
+}
+
+export async function navDown(host: string, auth?: PhoneAuth): Promise<ExecuteResult> {
+  return executePhoneCommand(host, ["Key:NavDwn"], auth);
+}
+
+export async function navLeft(host: string, auth?: PhoneAuth): Promise<ExecuteResult> {
+  return executePhoneCommand(host, ["Key:NavLeft"], auth);
+}
+
+export async function navRight(host: string, auth?: PhoneAuth): Promise<ExecuteResult> {
+  return executePhoneCommand(host, ["Key:NavRight"], auth);
+}
+
+export async function navSelect(host: string, auth?: PhoneAuth): Promise<ExecuteResult> {
+  return executePhoneCommand(host, ["Key:NavSelect"], auth);
 }
 
 export async function getScreenshot(
@@ -363,7 +441,12 @@ export async function getScreenshotAuto(
   auth?: PhoneAuth,
   modelHint?: string | null
 ): Promise<{ status: number; contentType: string | null; bytes: Uint8Array; usedUrl: string; attempted: string[] }> {
-  const candidates = guessScreenshotCandidates(modelHint || null);
+  // Use cached discovery data if available, falling back to modelHint then blind guessing
+  const cached = getCachedCapabilities(host);
+  const effectiveModelHint = modelHint || (cached ? cached.model : null);
+  const candidates = cached
+    ? cached.screenshotPaths.map((path) => ({ protocol: cached.protocol, path }))
+    : guessScreenshotCandidates(effectiveModelHint || null);
 
   // If caller passed a full URL with protocol, honor it.
   const hasScheme = host.includes("://");
