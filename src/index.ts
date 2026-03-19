@@ -4,6 +4,7 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import { z } from "zod";
 import { writeFileSync } from "fs";
+import crypto from "node:crypto";
 
 import {
   getDeviceInformation,
@@ -31,9 +32,15 @@ import {
   navRight,
   navSelect,
 } from "./phone.js";
-import { httpGetText } from "./http.js";
+import { httpGetText, type PhoneAuth } from "./http.js";
 import { discoverPhone } from "./discovery.js";
 import { log } from "./logger.js";
+
+// ── Request ID helper ────────────────────────────────────────────────
+
+function newReqId(): string {
+  return crypto.randomUUID().slice(0, 8);
+}
 
 // ── Credential warnings ──────────────────────────────────────────────
 if (process.env.PHONE_USERNAME || process.env.PHONE_PASSWORD) {
@@ -76,7 +83,11 @@ server.tool(
     timeoutMs: z.number().int().positive().optional(),
   },
   async ({ host, auth, timeoutMs }) => {
-    const resp = await httpGetText(host, "/", { auth, timeoutMs });
+    const reqId = newReqId();
+    const start = Date.now();
+    log.info("tool_start", { tool: "health", host, reqId });
+    const resp = await httpGetText(host, "/", { auth, timeoutMs, reqId });
+    log.info("tool_complete", { tool: "health", host, durationMs: Date.now() - start, reqId });
     return {
       content: [
         {
@@ -102,7 +113,11 @@ server.tool(
     auth: targetSchema.shape.auth,
   },
   async ({ host, auth }) => {
+    const reqId = newReqId();
+    const start = Date.now();
+    log.info("tool_start", { tool: "discover", host, reqId });
     const caps = await discoverPhone(host, auth);
+    log.info("tool_complete", { tool: "discover", host, durationMs: Date.now() - start, reqId });
     return { content: [{ type: "text", text: JSON.stringify(caps, null, 2) }] };
   }
 );
@@ -114,7 +129,11 @@ server.tool(
     auth: targetSchema.shape.auth,
   },
   async ({ host, auth }) => {
-    const di = await getDeviceInformation(host, auth);
+    const reqId = newReqId();
+    const start = Date.now();
+    log.info("tool_start", { tool: "get_device_information", host, reqId });
+    const di = await getDeviceInformation(host, auth, reqId);
+    log.info("tool_complete", { tool: "get_device_information", host, durationMs: Date.now() - start, reqId });
     return { content: [{ type: "text", text: JSON.stringify(di, null, 2) }] };
   }
 );
@@ -126,7 +145,11 @@ server.tool(
     auth: targetSchema.shape.auth,
   },
   async ({ host, auth }) => {
-    const nc = await getNetworkConfiguration(host, auth);
+    const reqId = newReqId();
+    const start = Date.now();
+    log.info("tool_start", { tool: "get_network_configuration", host, reqId });
+    const nc = await getNetworkConfiguration(host, auth, reqId);
+    log.info("tool_complete", { tool: "get_network_configuration", host, durationMs: Date.now() - start, reqId });
     return { content: [{ type: "text", text: JSON.stringify(nc, null, 2) }] };
   }
 );
@@ -138,7 +161,11 @@ server.tool(
     auth: targetSchema.shape.auth,
   },
   async ({ host, auth }) => {
-    const pi = await getPortInformation(host, auth);
+    const reqId = newReqId();
+    const start = Date.now();
+    log.info("tool_start", { tool: "get_port_information", host, reqId });
+    const pi = await getPortInformation(host, auth, reqId);
+    log.info("tool_complete", { tool: "get_port_information", host, durationMs: Date.now() - start, reqId });
     return { content: [{ type: "text", text: JSON.stringify(pi, null, 2) }] };
   }
 );
@@ -150,7 +177,11 @@ server.tool(
     auth: targetSchema.shape.auth,
   },
   async ({ host, auth }) => {
-    const ss = await getStreamingStatistics(host, auth);
+    const reqId = newReqId();
+    const start = Date.now();
+    log.info("tool_start", { tool: "get_streaming_statistics", host, reqId });
+    const ss = await getStreamingStatistics(host, auth, reqId);
+    log.info("tool_complete", { tool: "get_streaming_statistics", host, durationMs: Date.now() - start, reqId });
     return { content: [{ type: "text", text: JSON.stringify(ss, null, 2) }] };
   }
 );
@@ -163,7 +194,11 @@ server.tool(
     streamIndex: z.number().int().min(0).max(4).describe("0-4 (maps to Stream 1-5 on 79xx serviceability UI)"),
   },
   async ({ host, auth, streamIndex }) => {
-    const ss = await getStreamingStatisticsStream(host, streamIndex, auth);
+    const reqId = newReqId();
+    const start = Date.now();
+    log.info("tool_start", { tool: "get_streaming_statistics_stream", host, streamIndex, reqId });
+    const ss = await getStreamingStatisticsStream(host, streamIndex, auth, reqId);
+    log.info("tool_complete", { tool: "get_streaming_statistics_stream", host, durationMs: Date.now() - start, reqId });
     return { content: [{ type: "text", text: JSON.stringify(ss, null, 2) }] };
   }
 );
@@ -175,7 +210,11 @@ server.tool(
     auth: targetSchema.shape.auth,
   },
   async ({ host, auth }) => {
-    const ss = await getStreamingStatisticsAllStreams(host, auth);
+    const reqId = newReqId();
+    const start = Date.now();
+    log.info("tool_start", { tool: "get_streaming_statistics_all_streams", host, reqId });
+    const ss = await getStreamingStatisticsAllStreams(host, auth, reqId);
+    log.info("tool_complete", { tool: "get_streaming_statistics_all_streams", host, durationMs: Date.now() - start, reqId });
     return { content: [{ type: "text", text: JSON.stringify(ss, null, 2) }] };
   }
 );
@@ -187,7 +226,11 @@ server.tool(
     auth: targetSchema.shape.auth,
   },
   async ({ host, auth }) => {
-    const stats = await getRtpStats(host, auth);
+    const reqId = newReqId();
+    const start = Date.now();
+    log.info("tool_start", { tool: "get_rtp_stats", host, reqId });
+    const stats = await getRtpStats(host, auth, reqId);
+    log.info("tool_complete", { tool: "get_rtp_stats", host, durationMs: Date.now() - start, reqId });
     return { content: [{ type: "text", text: JSON.stringify(stats, null, 2) }] };
   }
 );
@@ -201,7 +244,11 @@ server.tool(
     path: z.string().optional().describe("Execute endpoint path (default: /CGI/Execute)"),
   },
   async ({ host, auth, urls, path }) => {
-    const resp = await executePhoneCommand(host, urls, auth, path || "/CGI/Execute");
+    const reqId = newReqId();
+    const start = Date.now();
+    log.info("tool_start", { tool: "execute", host, urls, reqId });
+    const resp = await executePhoneCommand(host, urls, auth, path || "/CGI/Execute", reqId);
+    log.info("tool_complete", { tool: "execute", host, durationMs: Date.now() - start, reqId });
     return {
       content: [
         {
@@ -233,6 +280,9 @@ server.tool(
     path: z.string().optional().describe("Execute endpoint path (default: /CGI/Execute)"),
   },
   async ({ host, auth, digits, speaker, path }) => {
+    const reqId = newReqId();
+    const start = Date.now();
+    log.info("tool_start", { tool: "dial", host, digits, reqId });
     const validated = validateDialString(digits);
     const urls: string[] = [];
     if (speaker ?? true) {
@@ -240,7 +290,8 @@ server.tool(
     }
     urls.push(`Dial:${validated}`);
 
-    const resp = await executePhoneCommand(host, urls, auth, path || "/CGI/Execute");
+    const resp = await executePhoneCommand(host, urls, auth, path || "/CGI/Execute", reqId);
+    log.info("tool_complete", { tool: "dial", host, durationMs: Date.now() - start, reqId });
     return {
       content: [
         {
@@ -269,9 +320,13 @@ server.tool(
     path: z.string().optional().describe("Execute endpoint path (default: /CGI/Execute)"),
   },
   async ({ host, auth, repeat, path }) => {
+    const reqId = newReqId();
+    const start = Date.now();
+    log.info("tool_start", { tool: "end_call", host, reqId });
     const r = repeat ?? 2;
     const urls = Array.from({ length: r }, () => "Key:EndCall");
-    const resp = await executePhoneCommand(host, urls, auth, path || "/CGI/Execute");
+    const resp = await executePhoneCommand(host, urls, auth, path || "/CGI/Execute", reqId);
+    log.info("tool_complete", { tool: "end_call", host, durationMs: Date.now() - start, reqId });
     return {
       content: [
         {
@@ -304,6 +359,17 @@ function simpleKeyResult(resp: { status: number; responseXml: string }) {
   };
 }
 
+function wrapSimpleTool(toolName: string, fn: (host: string, auth?: PhoneAuth) => Promise<{ status: number; responseXml: string }>) {
+  return async ({ host, auth }: { host: string; auth?: PhoneAuth }) => {
+    const reqId = newReqId();
+    const start = Date.now();
+    log.info("tool_start", { tool: toolName, host, reqId });
+    const result = simpleKeyResult(await fn(host, auth));
+    log.info("tool_complete", { tool: toolName, host, durationMs: Date.now() - start, reqId });
+    return result;
+  };
+}
+
 server.tool(
   "hold_resume",
   "Toggle hold on the active call",
@@ -311,7 +377,7 @@ server.tool(
     host: targetSchema.shape.host,
     auth: targetSchema.shape.auth,
   },
-  async ({ host, auth }) => simpleKeyResult(await holdResume(host, auth))
+  wrapSimpleTool("hold_resume", holdResume)
 );
 
 server.tool(
@@ -321,7 +387,7 @@ server.tool(
     host: targetSchema.shape.host,
     auth: targetSchema.shape.auth,
   },
-  async ({ host, auth }) => simpleKeyResult(await transfer(host, auth))
+  wrapSimpleTool("transfer", transfer)
 );
 
 server.tool(
@@ -331,7 +397,7 @@ server.tool(
     host: targetSchema.shape.host,
     auth: targetSchema.shape.auth,
   },
-  async ({ host, auth }) => simpleKeyResult(await conference(host, auth))
+  wrapSimpleTool("conference", conference)
 );
 
 server.tool(
@@ -341,7 +407,7 @@ server.tool(
     host: targetSchema.shape.host,
     auth: targetSchema.shape.auth,
   },
-  async ({ host, auth }) => simpleKeyResult(await muteToggle(host, auth))
+  wrapSimpleTool("mute", muteToggle)
 );
 
 server.tool(
@@ -351,7 +417,7 @@ server.tool(
     host: targetSchema.shape.host,
     auth: targetSchema.shape.auth,
   },
-  async ({ host, auth }) => simpleKeyResult(await volumeUp(host, auth))
+  wrapSimpleTool("volume_up", volumeUp)
 );
 
 server.tool(
@@ -361,7 +427,7 @@ server.tool(
     host: targetSchema.shape.host,
     auth: targetSchema.shape.auth,
   },
-  async ({ host, auth }) => simpleKeyResult(await volumeDown(host, auth))
+  wrapSimpleTool("volume_down", volumeDown)
 );
 
 server.tool(
@@ -371,7 +437,7 @@ server.tool(
     host: targetSchema.shape.host,
     auth: targetSchema.shape.auth,
   },
-  async ({ host, auth }) => simpleKeyResult(await speakerToggle(host, auth))
+  wrapSimpleTool("speaker", speakerToggle)
 );
 
 server.tool(
@@ -381,7 +447,7 @@ server.tool(
     host: targetSchema.shape.host,
     auth: targetSchema.shape.auth,
   },
-  async ({ host, auth }) => simpleKeyResult(await headsetToggle(host, auth))
+  wrapSimpleTool("headset", headsetToggle)
 );
 
 server.tool(
@@ -393,6 +459,9 @@ server.tool(
     direction: z.enum(["up", "down", "left", "right", "select"]).describe("Navigation direction"),
   },
   async ({ host, auth, direction }) => {
+    const reqId = newReqId();
+    const start = Date.now();
+    log.info("tool_start", { tool: "navigate", host, direction, reqId });
     const navFns = {
       up: navUp,
       down: navDown,
@@ -400,7 +469,9 @@ server.tool(
       right: navRight,
       select: navSelect,
     } as const;
-    return simpleKeyResult(await navFns[direction](host, auth));
+    const result = simpleKeyResult(await navFns[direction](host, auth));
+    log.info("tool_complete", { tool: "navigate", host, direction, durationMs: Date.now() - start, reqId });
+    return result;
   }
 );
 
@@ -416,11 +487,15 @@ server.tool(
       .describe("Optional output file path. If omitted, writes /tmp/phone-screenshot.<ext>"),
   },
   async ({ host, auth, path, outFile }) => {
-    const resp = await getScreenshot(host, auth, path || "/CGI/Screenshot");
+    const reqId = newReqId();
+    const start = Date.now();
+    log.info("tool_start", { tool: "screenshot", host, reqId });
+    const resp = await getScreenshot(host, auth, path || "/CGI/Screenshot", reqId);
     const ct = resp.contentType || "application/octet-stream";
     const ext = ct.includes("png") ? "png" : ct.includes("jpeg") ? "jpg" : ct.includes("bmp") ? "bmp" : "bin";
     const file = outFile || `/tmp/phone-screenshot.${ext}`;
     writeFileSync(file, resp.bytes);
+    log.info("tool_complete", { tool: "screenshot", host, durationMs: Date.now() - start, bytes: resp.bytes.length, reqId });
     return {
       content: [
         {
@@ -453,13 +528,17 @@ server.tool(
       .describe("Optional output file path. If omitted, writes /tmp/phone-screenshot.<ext>"),
   },
   async ({ host, auth, modelHint, outFile }) => {
-    const resp = await getScreenshotAuto(host, auth, modelHint);
+    const reqId = newReqId();
+    const start = Date.now();
+    log.info("tool_start", { tool: "screenshot_auto", host, modelHint: modelHint || null, reqId });
+    const resp = await getScreenshotAuto(host, auth, modelHint, reqId);
     const ct = resp.contentType || "application/octet-stream";
     const ext = ct.includes("png") ? "png" : ct.includes("jpeg") ? "jpg" : ct.includes("bmp") ? "bmp" : "bin";
     const file = outFile || `/tmp/phone-screenshot.${ext}`;
     if (resp.bytes.length > 0) {
       writeFileSync(file, resp.bytes);
     }
+    log.info("tool_complete", { tool: "screenshot_auto", host, durationMs: Date.now() - start, bytes: resp.bytes.length, reqId });
     return {
       content: [
         {
@@ -491,7 +570,11 @@ server.tool(
     timeoutMs: z.number().int().positive().optional(),
   },
   async ({ host, auth, path, timeoutMs }) => {
-    const resp = await httpGetText(host, path, { auth, timeoutMs });
+    const reqId = newReqId();
+    const start = Date.now();
+    log.info("tool_start", { tool: "raw_get", host, path, reqId });
+    const resp = await httpGetText(host, path, { auth, timeoutMs, reqId });
+    log.info("tool_complete", { tool: "raw_get", host, durationMs: Date.now() - start, reqId });
     return {
       content: [
         {

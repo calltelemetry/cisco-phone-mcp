@@ -98,9 +98,14 @@ function throwForStatus(host: string, endpoint: string, status: number): never {
   throw new PhoneCommandError(host, status, `${endpoint} HTTP ${status}`);
 }
 
+/** Helper to build optional reqId spread object. */
+function rid(reqId?: string): Record<string, unknown> {
+  return reqId ? { reqId } : {};
+}
+
 export async function getDeviceInformation(host: string, auth?: PhoneAuth, reqId?: string): Promise<DeviceInformation> {
   const start = Date.now();
-  log.info("phone_op_start", { op: "getDeviceInformation", host, ...(reqId ? { reqId } : {}) });
+  log.info("phone_op_start", { op: "getDeviceInformation", host, ...rid(reqId) });
   try {
     const resp = await httpGetText(host, "/DeviceInformationX", { auth, reqId });
     if (resp.status >= 400) {
@@ -117,17 +122,17 @@ export async function getDeviceInformation(host: string, auth?: PhoneAuth, reqId
       versionId: asString(di["versionID"]),
       appLoadId: asString(di["appLoadID"]),
     };
-    log.info("phone_op_complete", { op: "getDeviceInformation", host, durationMs: Date.now() - start, success: true, ...(reqId ? { reqId } : {}) });
+    log.info("phone_op_complete", { op: "getDeviceInformation", host, durationMs: Date.now() - start, success: true, ...rid(reqId) });
     return result;
   } catch (err) {
-    log.error("phone_op_complete", { op: "getDeviceInformation", host, durationMs: Date.now() - start, success: false, error: err instanceof Error ? err.message : String(err), ...(reqId ? { reqId } : {}) });
+    log.error("phone_op_complete", { op: "getDeviceInformation", host, durationMs: Date.now() - start, success: false, error: err instanceof Error ? err.message : String(err), ...rid(reqId) });
     throw err;
   }
 }
 
 export async function getNetworkConfiguration(host: string, auth?: PhoneAuth, reqId?: string): Promise<NetworkConfiguration> {
   const start = Date.now();
-  log.info("phone_op_start", { op: "getNetworkConfiguration", host, ...(reqId ? { reqId } : {}) });
+  log.info("phone_op_start", { op: "getNetworkConfiguration", host, ...rid(reqId) });
   try {
     const resp = await httpGetText(host, "/NetworkConfigurationX", { auth, reqId });
     if (resp.status >= 400) {
@@ -146,17 +151,17 @@ export async function getNetworkConfiguration(host: string, auth?: PhoneAuth, re
       tftpServer1: asString(nc["TFTPServer1"]),
       callManager1: asString(nc["CallManager1"]),
     };
-    log.info("phone_op_complete", { op: "getNetworkConfiguration", host, durationMs: Date.now() - start, success: true, ...(reqId ? { reqId } : {}) });
+    log.info("phone_op_complete", { op: "getNetworkConfiguration", host, durationMs: Date.now() - start, success: true, ...rid(reqId) });
     return result;
   } catch (err) {
-    log.error("phone_op_complete", { op: "getNetworkConfiguration", host, durationMs: Date.now() - start, success: false, error: err instanceof Error ? err.message : String(err), ...(reqId ? { reqId } : {}) });
+    log.error("phone_op_complete", { op: "getNetworkConfiguration", host, durationMs: Date.now() - start, success: false, error: err instanceof Error ? err.message : String(err), ...rid(reqId) });
     throw err;
   }
 }
 
 export async function getPortInformation(host: string, auth?: PhoneAuth, reqId?: string): Promise<PortInformation> {
   const start = Date.now();
-  log.info("phone_op_start", { op: "getPortInformation", host, ...(reqId ? { reqId } : {}) });
+  log.info("phone_op_start", { op: "getPortInformation", host, ...rid(reqId) });
   try {
     const resp = await httpGetText(host, "/PortInformationX", { auth, reqId });
     if (resp.status >= 400) {
@@ -173,17 +178,17 @@ export async function getPortInformation(host: string, auth?: PhoneAuth, reqId?:
       lldpNeighborIp: asString(pi["LLDPNeighborIP"]),
       lldpNeighborPort: asString(pi["LLDPNeighborPort"]),
     };
-    log.info("phone_op_complete", { op: "getPortInformation", host, durationMs: Date.now() - start, success: true, ...(reqId ? { reqId } : {}) });
+    log.info("phone_op_complete", { op: "getPortInformation", host, durationMs: Date.now() - start, success: true, ...rid(reqId) });
     return result;
   } catch (err) {
-    log.error("phone_op_complete", { op: "getPortInformation", host, durationMs: Date.now() - start, success: false, error: err instanceof Error ? err.message : String(err), ...(reqId ? { reqId } : {}) });
+    log.error("phone_op_complete", { op: "getPortInformation", host, durationMs: Date.now() - start, success: false, error: err instanceof Error ? err.message : String(err), ...rid(reqId) });
     throw err;
   }
 }
 
 export async function getStreamingStatistics(host: string, auth?: PhoneAuth, reqId?: string): Promise<StreamingStatistics> {
   const start = Date.now();
-  log.info("phone_op_start", { op: "getStreamingStatistics", host, ...(reqId ? { reqId } : {}) });
+  log.info("phone_op_start", { op: "getStreamingStatistics", host, ...rid(reqId) });
   try {
     const resp = await httpGetText(host, "/StreamingStatisticsX", { auth, reqId });
     if (resp.status >= 400) {
@@ -216,10 +221,10 @@ export async function getStreamingStatistics(host: string, auth?: PhoneAuth, req
       senderJoins: asInt(ss["SenderJoins"]),
       byes: asInt(ss["Byes"]),
     };
-    log.info("phone_op_complete", { op: "getStreamingStatistics", host, durationMs: Date.now() - start, success: true, ...(reqId ? { reqId } : {}) });
+    log.info("phone_op_complete", { op: "getStreamingStatistics", host, durationMs: Date.now() - start, success: true, ...rid(reqId) });
     return result;
   } catch (err) {
-    log.error("phone_op_complete", { op: "getStreamingStatistics", host, durationMs: Date.now() - start, success: false, error: err instanceof Error ? err.message : String(err), ...(reqId ? { reqId } : {}) });
+    log.error("phone_op_complete", { op: "getStreamingStatistics", host, durationMs: Date.now() - start, success: false, error: err instanceof Error ? err.message : String(err), ...rid(reqId) });
     throw err;
   }
 }
@@ -246,93 +251,106 @@ function extractBoldValue(html: string, label: string): string | null {
 export async function getStreamingStatisticsStream(
   host: string,
   streamIndex: number,
-  auth?: PhoneAuth
+  auth?: PhoneAuth,
+  reqId?: string
 ): Promise<StreamingStatisticsStream> {
   if (streamIndex < 0 || streamIndex > 4) {
     throw new Error(`streamIndex out of range (0-4): ${streamIndex}`);
   }
 
-  // Prefer the Serviceability HTML endpoint because it explicitly supports multiple streams.
-  const path = `/CGI/Java/Serviceability?adapter=device.statistics.streaming.${streamIndex}`;
-  const resp = await httpGetText(host, path, { auth });
-  if (resp.status >= 400) {
-    throwForStatus(host, `/CGI/Java/Serviceability?streaming.${streamIndex}`, resp.status);
+  const start = Date.now();
+  log.debug("phone_op_start", { op: "getStreamingStatisticsStream", host, streamIndex, ...rid(reqId) });
+
+  try {
+    // Prefer the Serviceability HTML endpoint because it explicitly supports multiple streams.
+    const path = `/CGI/Java/Serviceability?adapter=device.statistics.streaming.${streamIndex}`;
+    const resp = await httpGetText(host, path, { auth, reqId });
+    if (resp.status >= 400) {
+      throwForStatus(host, `/CGI/Java/Serviceability?streaming.${streamIndex}`, resp.status);
+    }
+
+    const remoteAddrRaw = extractBoldValue(resp.body, "Remote Address");
+    const localAddrRaw = extractBoldValue(resp.body, "Local Address");
+    const streamStatus = extractBoldValue(resp.body, "Stream Status");
+    const name = extractBoldValue(resp.body, "Host Name");
+
+    const senderPackets = asInt(extractBoldValue(resp.body, "Sender Packets"));
+    const senderOctets = asInt(extractBoldValue(resp.body, "Sender Octets"));
+    const senderCodec = extractBoldValue(resp.body, "Sender Codec");
+
+    const rcvrLostPackets = asInt(
+      pickBetween(
+        extractBoldValue(resp.body, "Rcvr Lost Packets"),
+        extractBoldValue(resp.body, "Receiver lost packets"),
+        extractBoldValue(resp.body, "Receiver Lost Packets")
+      )
+    );
+    const avgJitter = asInt(extractBoldValue(resp.body, "Avg Jitter"));
+    const maxJitter = asInt(extractBoldValue(resp.body, "Max Jitter"));
+    const latency = asInt(extractBoldValue(resp.body, "Latency"));
+    const rcvrCodec = pickBetween(
+      extractBoldValue(resp.body, "Rcvr Codec"),
+      extractBoldValue(resp.body, "Receiver codec"),
+      extractBoldValue(resp.body, "Receiver Codec")
+    );
+    const rcvrPackets = asInt(
+      pickBetween(
+        extractBoldValue(resp.body, "Rcvr Packets"),
+        extractBoldValue(resp.body, "Receiver packets"),
+        extractBoldValue(resp.body, "Receiver Packets")
+      )
+    );
+    const rcvrOctets = asInt(
+      pickBetween(
+        extractBoldValue(resp.body, "Rcvr Octets"),
+        extractBoldValue(resp.body, "Receiver octets"),
+        extractBoldValue(resp.body, "Receiver Octets")
+      )
+    );
+    const rcvrDiscarded = asInt(extractBoldValue(resp.body, "Rcvr Discarded"));
+
+    const mosLqk = (() => {
+      const v = extractBoldValue(resp.body, "MOS LQK");
+      if (!v) return null;
+      const n = Number.parseFloat(v);
+      return Number.isFinite(n) ? n : null;
+    })();
+
+    const result = {
+      streamIndex,
+      remoteAddrRaw,
+      localAddrRaw,
+      streamStatus,
+      name,
+      senderPackets,
+      senderOctets,
+      senderCodec,
+      rcvrLostPackets,
+      avgJitter,
+      maxJitter,
+      latency,
+      rcvrCodec,
+      rcvrPackets,
+      rcvrOctets,
+      mosLqk,
+      rcvrDiscarded,
+    };
+    log.debug("phone_op_complete", { op: "getStreamingStatisticsStream", host, streamIndex, durationMs: Date.now() - start, success: true, ...rid(reqId) });
+    return result;
+  } catch (err) {
+    log.error("phone_op_complete", { op: "getStreamingStatisticsStream", host, streamIndex, durationMs: Date.now() - start, success: false, error: err instanceof Error ? err.message : String(err), ...rid(reqId) });
+    throw err;
   }
-
-  const remoteAddrRaw = extractBoldValue(resp.body, "Remote Address");
-  const localAddrRaw = extractBoldValue(resp.body, "Local Address");
-  const streamStatus = extractBoldValue(resp.body, "Stream Status");
-  const name = extractBoldValue(resp.body, "Host Name");
-
-  const senderPackets = asInt(extractBoldValue(resp.body, "Sender Packets"));
-  const senderOctets = asInt(extractBoldValue(resp.body, "Sender Octets"));
-  const senderCodec = extractBoldValue(resp.body, "Sender Codec");
-
-  const rcvrLostPackets = asInt(
-    pickBetween(
-      extractBoldValue(resp.body, "Rcvr Lost Packets"),
-      extractBoldValue(resp.body, "Receiver lost packets"),
-      extractBoldValue(resp.body, "Receiver Lost Packets")
-    )
-  );
-  const avgJitter = asInt(extractBoldValue(resp.body, "Avg Jitter"));
-  const maxJitter = asInt(extractBoldValue(resp.body, "Max Jitter"));
-  const latency = asInt(extractBoldValue(resp.body, "Latency"));
-  const rcvrCodec = pickBetween(
-    extractBoldValue(resp.body, "Rcvr Codec"),
-    extractBoldValue(resp.body, "Receiver codec"),
-    extractBoldValue(resp.body, "Receiver Codec")
-  );
-  const rcvrPackets = asInt(
-    pickBetween(
-      extractBoldValue(resp.body, "Rcvr Packets"),
-      extractBoldValue(resp.body, "Receiver packets"),
-      extractBoldValue(resp.body, "Receiver Packets")
-    )
-  );
-  const rcvrOctets = asInt(
-    pickBetween(
-      extractBoldValue(resp.body, "Rcvr Octets"),
-      extractBoldValue(resp.body, "Receiver octets"),
-      extractBoldValue(resp.body, "Receiver Octets")
-    )
-  );
-  const rcvrDiscarded = asInt(extractBoldValue(resp.body, "Rcvr Discarded"));
-
-  const mosLqk = (() => {
-    const v = extractBoldValue(resp.body, "MOS LQK");
-    if (!v) return null;
-    const n = Number.parseFloat(v);
-    return Number.isFinite(n) ? n : null;
-  })();
-
-  return {
-    streamIndex,
-    remoteAddrRaw,
-    localAddrRaw,
-    streamStatus,
-    name,
-    senderPackets,
-    senderOctets,
-    senderCodec,
-    rcvrLostPackets,
-    avgJitter,
-    maxJitter,
-    latency,
-    rcvrCodec,
-    rcvrPackets,
-    rcvrOctets,
-    mosLqk,
-    rcvrDiscarded,
-  };
 }
 
-export async function getStreamingStatisticsAllStreams(host: string, auth?: PhoneAuth): Promise<StreamingStatisticsStream[]> {
+export async function getStreamingStatisticsAllStreams(host: string, auth?: PhoneAuth, reqId?: string): Promise<StreamingStatisticsStream[]> {
+  const start = Date.now();
+  log.info("phone_op_start", { op: "getStreamingStatisticsAllStreams", host, streamCount: 5, ...rid(reqId) });
   const indices = [0, 1, 2, 3, 4];
   const results = await Promise.allSettled(
-    indices.map((i) => getStreamingStatisticsStream(host, i, auth))
+    indices.map((i) => getStreamingStatisticsStream(host, i, auth, reqId))
   );
-  return results.map((result, i) => {
+  const out = results.map((result, i) => {
     if (result.status === "fulfilled") {
       return result.value;
     }
@@ -347,37 +365,57 @@ export async function getStreamingStatisticsAllStreams(host: string, auth?: Phon
       error: { code: errCode, message: errMsg },
     } as StreamingStatisticsStream;
   });
+  log.info("phone_op_complete", { op: "getStreamingStatisticsAllStreams", host, durationMs: Date.now() - start, success: true, ...rid(reqId) });
+  return out;
 }
 
-export async function getRtpStats(host: string, auth?: PhoneAuth): Promise<RtpStatsSummary> {
-  const ss = await getStreamingStatistics(host, auth);
-  return {
-    streamStatus: ss.streamStatus,
-    local: parseIpPort(ss.localAddrRaw || null),
-    remote: parseIpPort(ss.remoteAddrRaw || null),
-    rxPackets: ss.rcvrPackets ?? null,
-    txPackets: ss.senderPackets ?? null,
-    lostPackets: ss.rcvrLostPackets ?? null,
-    jitter: { avg: ss.avgJitter ?? null, max: ss.maxJitter ?? null },
-    codec: { rx: ss.rcvrCodec ?? null, tx: ss.senderCodec ?? null },
-    mosLqk: ss.mosLqk ?? null,
-  };
+export async function getRtpStats(host: string, auth?: PhoneAuth, reqId?: string): Promise<RtpStatsSummary> {
+  const start = Date.now();
+  log.info("phone_op_start", { op: "getRtpStats", host, ...rid(reqId) });
+  try {
+    const ss = await getStreamingStatistics(host, auth, reqId);
+    const result = {
+      streamStatus: ss.streamStatus,
+      local: parseIpPort(ss.localAddrRaw || null),
+      remote: parseIpPort(ss.remoteAddrRaw || null),
+      rxPackets: ss.rcvrPackets ?? null,
+      txPackets: ss.senderPackets ?? null,
+      lostPackets: ss.rcvrLostPackets ?? null,
+      jitter: { avg: ss.avgJitter ?? null, max: ss.maxJitter ?? null },
+      codec: { rx: ss.rcvrCodec ?? null, tx: ss.senderCodec ?? null },
+      mosLqk: ss.mosLqk ?? null,
+    };
+    log.info("phone_op_complete", { op: "getRtpStats", host, durationMs: Date.now() - start, success: true, ...rid(reqId) });
+    return result;
+  } catch (err) {
+    log.error("phone_op_complete", { op: "getRtpStats", host, durationMs: Date.now() - start, success: false, error: err instanceof Error ? err.message : String(err), ...rid(reqId) });
+    throw err;
+  }
 }
 
 export async function executePhoneCommand(
   host: string,
   urls: string[],
   auth?: PhoneAuth,
-  path = "/CGI/Execute"
+  path = "/CGI/Execute",
+  reqId?: string
 ): Promise<{ status: number; responseXml: string }> {
-  const xml =
-    `<?xml version="1.0" encoding="utf-8"?>` +
-    `<CiscoIPPhoneExecute>` +
-    urls.map((u) => `<ExecuteItem Priority="0" URL="${escapeXmlAttr(u)}"/>`).join("") +
-    `</CiscoIPPhoneExecute>`;
+  const start = Date.now();
+  log.info("phone_op_start", { op: "executePhoneCommand", host, commands: urls, ...rid(reqId) });
+  try {
+    const xml =
+      `<?xml version="1.0" encoding="utf-8"?>` +
+      `<CiscoIPPhoneExecute>` +
+      urls.map((u) => `<ExecuteItem Priority="0" URL="${escapeXmlAttr(u)}"/>`).join("") +
+      `</CiscoIPPhoneExecute>`;
 
-  const resp = await httpPostForm(host, path, { XML: xml }, { auth });
-  return { status: resp.status, responseXml: resp.body };
+    const resp = await httpPostForm(host, path, { XML: xml }, { auth, reqId });
+    log.info("phone_op_complete", { op: "executePhoneCommand", host, durationMs: Date.now() - start, success: resp.status < 400, status: resp.status, ...rid(reqId) });
+    return { status: resp.status, responseXml: resp.body };
+  } catch (err) {
+    log.error("phone_op_complete", { op: "executePhoneCommand", host, durationMs: Date.now() - start, success: false, error: err instanceof Error ? err.message : String(err), ...rid(reqId) });
+    throw err;
+  }
 }
 
 function escapeXmlAttr(v: string): string {
@@ -403,7 +441,7 @@ export function validateDialString(digits: string): string {
     );
   }
   if (trimmed.length > 30) {
-    console.warn(`[cisco-phone] Warning: suspiciously long dial string (${trimmed.length} chars): ${trimmed}`);
+    log.warn("dial_string_long", { length: trimmed.length, digits: trimmed });
   }
   return trimmed;
 }
@@ -467,11 +505,20 @@ export async function navSelect(host: string, auth?: PhoneAuth): Promise<Execute
 export async function getScreenshot(
   host: string,
   auth?: PhoneAuth,
-  path = "/CGI/Screenshot"
+  path = "/CGI/Screenshot",
+  reqId?: string
 ): Promise<{ status: number; contentType: string | null; bytes: Uint8Array }> {
-  const resp = await httpGetBytes(host, path, { auth, timeoutMs: 20000 });
-  const ct = resp.headers["content-type"] || null;
-  return { status: resp.status, contentType: ct, bytes: resp.body };
+  const start = Date.now();
+  log.info("phone_op_start", { op: "getScreenshot", host, ...rid(reqId) });
+  try {
+    const resp = await httpGetBytes(host, path, { auth, timeoutMs: 20000, reqId });
+    const ct = resp.headers["content-type"] || null;
+    log.info("phone_op_complete", { op: "getScreenshot", host, durationMs: Date.now() - start, success: resp.status === 200, bytes: resp.body.length, ...rid(reqId) });
+    return { status: resp.status, contentType: ct, bytes: resp.body };
+  } catch (err) {
+    log.error("phone_op_complete", { op: "getScreenshot", host, durationMs: Date.now() - start, success: false, error: err instanceof Error ? err.message : String(err), ...rid(reqId) });
+    throw err;
+  }
 }
 
 function looksLikeCiscoModelPrefix(model: string, prefix: string): boolean {
@@ -506,8 +553,12 @@ function guessScreenshotCandidates(modelHint: string | null): Array<{ protocol?:
 export async function getScreenshotAuto(
   host: string,
   auth?: PhoneAuth,
-  modelHint?: string | null
+  modelHint?: string | null,
+  reqId?: string
 ): Promise<{ status: number; contentType: string | null; bytes: Uint8Array; usedUrl: string; attempted: string[] }> {
+  const start = Date.now();
+  log.info("phone_op_start", { op: "getScreenshotAuto", host, modelHint: modelHint || null, ...rid(reqId) });
+
   // Use cached discovery data if available, falling back to modelHint then blind guessing
   const cached = getCachedCapabilities(host);
   const effectiveModelHint = modelHint || (cached ? cached.model : null);
@@ -527,11 +578,12 @@ export async function getScreenshotAuto(
     const url = `${base.replace(/\/$/, "")}${c.path}`;
     attempted.push(url);
 
-    const resp = await httpGetBytes(base, c.path, { auth, timeoutMs: 20000 });
+    const resp = await httpGetBytes(base, c.path, { auth, timeoutMs: 20000, reqId });
     lastStatus = resp.status;
     lastCt = resp.headers["content-type"] || null;
 
     if (resp.status === 200 && resp.body && resp.body.length > 0) {
+      log.info("phone_op_complete", { op: "getScreenshotAuto", host, durationMs: Date.now() - start, success: true, usedUrl: url, bytes: resp.body.length, ...rid(reqId) });
       return { status: resp.status, contentType: lastCt, bytes: resp.body, usedUrl: url, attempted };
     }
 
@@ -541,6 +593,7 @@ export async function getScreenshotAuto(
     }
   }
 
+  log.warn("phone_op_complete", { op: "getScreenshotAuto", host, durationMs: Date.now() - start, success: false, lastStatus, attempted, ...rid(reqId) });
   return {
     status: lastStatus || 500,
     contentType: lastCt,
