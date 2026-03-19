@@ -1,9 +1,16 @@
 import { readFileSync } from "fs";
+import https from "node:https";
 import { log } from "./logger.js";
+import {
+  PhoneUnreachableError,
+  PhoneTimeoutError,
+} from "./errors.js";
 
 export interface PhoneAuth {
   username?: string;
   password?: string;
+  /** Skip TLS certificate verification (self-signed certs). Overrides PHONE_TLS_INSECURE env. */
+  tlsInsecure?: boolean;
 }
 
 export interface PhoneTarget {
@@ -18,6 +25,59 @@ export interface RequestOptions {
   timeoutMs?: number;
   reqId?: string;
 }
+
+// ---------------------------------------------------------------------------
+// TLS helpers
+// ---------------------------------------------------------------------------
+
+let _cachedAgent: https.Agent | undefined;
+
+function getTlsAgent(auth?: PhoneAuth): https.Agent | undefined {
+  const insecure =
+    auth?.tlsInsecure ??
+    (process.env.PHONE_TLS_INSECURE === "true" || process.env.PHONE_TLS_INSECURE === "1");
+  const caPath = process.env.PHONE_CA_CERT;
+
+  if (!insecure && !caPath) return undefined;
+
+  // Return cached agent when only env-level settings are active (no per-request override).
+  if (auth?.tlsInsecure == null && _cachedAgent) return _cachedAgent;
+
+  const opts: https.AgentOptions = { keepAlive: true };
+  if (insecure) opts.rejectUnauthorized = false;
+  if (caPath) {
+    try {
+      opts.ca = readFileSync(caPath);
+    } catch (e) {
+      log.warn("tls_ca_read_failed", { path: caPath, error: String(e) });
+    }
+  }
+
+  const agent = new https.Agent(opts);
+  // Only cache when no per-request tlsInsecure override was provided.
+  if (auth?.tlsInsecure == null) _cachedAgent = agent;
+  return agent;
+}
+
+/**
+ * Apply TLS environment settings for Node's native fetch (undici).
+ * Node >= 18 native fetch does not support https.Agent, so we fall back
+ * to NODE_TLS_REJECT_UNAUTHORIZED for insecure mode.
+ */
+function applyTlsEnv(auth?: PhoneAuth): void {
+  const insecure =
+    auth?.tlsInsecure ??
+    (process.env.PHONE_TLS_INSECURE === "true" || process.env.PHONE_TLS_INSECURE === "1");
+  if (insecure) {
+    process.env.NODE_TLS_REJECT_UNAUTHORIZED = "0";
+  }
+  // Eagerly build the agent so the CA cert is loaded once.
+  getTlsAgent(auth);
+}
+
+// ---------------------------------------------------------------------------
+// Defaults
+// ---------------------------------------------------------------------------
 
 export function getDefaultAuth(): PhoneAuth | undefined {
   const username = process.env.PHONE_USERNAME || process.env.PHONE_USER;
@@ -59,6 +119,119 @@ function buildAuthHeader(auth: PhoneAuth | undefined): string | undefined {
   return `Basic ${token}`;
 }
 
+function extractHost(target: string | PhoneTarget): string {
+  if (typeof target === "string") {
+    return normalizeTarget(target).host;
+  }
+  return target.host;
+}
+
+// ---------------------------------------------------------------------------
+// Retry logic — exponential backoff for transient errors
+// ---------------------------------------------------------------------------
+
+const MAX_RETRIES = 2;
+const INITIAL_DELAY_MS = 500;
+
+function isTransientNetworkError(err: unknown): boolean {
+  if (err instanceof Error) {
+    const msg = err.message.toLowerCase();
+    if (
+      msg.includes("econnreset") ||
+      msg.includes("econnrefused") ||
+      msg.includes("epipe") ||
+      msg.includes("socket hang up") ||
+      msg.includes("network") ||
+      msg.includes("fetch failed")
+    ) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function isTimeoutError(err: unknown): boolean {
+  if (err instanceof Error) {
+    if (err.name === "TimeoutError" || err.name === "AbortError") return true;
+    const msg = err.message.toLowerCase();
+    if (msg.includes("timeout") || msg.includes("aborterror")) return true;
+  }
+  return false;
+}
+
+function isTransientStatus(status: number): boolean {
+  return status >= 500;
+}
+
+async function sleep(ms: number): Promise<void> {
+  return new Promise((r) => setTimeout(r, ms));
+}
+
+/**
+ * Wraps a fetch call with retry logic.
+ * - Retries on 5xx, ECONNRESET, and timeout (max 2 retries, exponential backoff).
+ * - Does NOT retry on 4xx (client errors).
+ */
+async function fetchWithRetry(
+  url: string,
+  init: RequestInit,
+  hostForErrors: string,
+  timeoutMs: number,
+): Promise<Response> {
+  let lastError: unknown;
+
+  for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
+    try {
+      const resp = await fetch(url, init);
+
+      // Never retry client errors (4xx).
+      if (resp.status >= 400 && resp.status < 500) return resp;
+
+      // Retry server errors (5xx) with backoff.
+      if (isTransientStatus(resp.status) && attempt < MAX_RETRIES) {
+        log.warn("http_retry_5xx", { url, status: resp.status, attempt: attempt + 1 });
+        await sleep(INITIAL_DELAY_MS * 2 ** attempt);
+        continue;
+      }
+
+      return resp;
+    } catch (err) {
+      lastError = err;
+
+      if (isTimeoutError(err)) {
+        if (attempt < MAX_RETRIES) {
+          log.warn("http_retry_timeout", { url, attempt: attempt + 1 });
+          await sleep(INITIAL_DELAY_MS * 2 ** attempt);
+          continue;
+        }
+        throw new PhoneTimeoutError(hostForErrors, timeoutMs);
+      }
+
+      if (isTransientNetworkError(err) && attempt < MAX_RETRIES) {
+        log.warn("http_retry_network", { url, error: String(err), attempt: attempt + 1 });
+        await sleep(INITIAL_DELAY_MS * 2 ** attempt);
+        continue;
+      }
+
+      // Non-transient / non-retryable network error.
+      throw new PhoneUnreachableError(hostForErrors, `${err}`);
+    }
+  }
+
+  // Exhausted retries.
+  if (isTimeoutError(lastError)) {
+    throw new PhoneTimeoutError(hostForErrors, timeoutMs);
+  }
+  throw new PhoneUnreachableError(
+    hostForErrors,
+    `Failed after ${MAX_RETRIES + 1} attempts: ${lastError}`,
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Exported HTTP methods
+// ---------------------------------------------------------------------------
+
 export async function httpGetText(
   target: string | PhoneTarget,
   path: string,
@@ -68,6 +241,7 @@ export async function httpGetText(
   const base = buildBaseUrl(t);
   const url = new URL(path, base).toString();
   const timeoutMs = opts.timeoutMs ?? 10000;
+  const auth = opts.auth || getDefaultAuth();
   const reqMeta: Record<string, unknown> = { method: "GET", url, host: t.host };
   if (opts.reqId) reqMeta.reqId = opts.reqId;
 
@@ -75,15 +249,18 @@ export async function httpGetText(
   const start = Date.now();
 
   const headers: Record<string, string> = { ...(opts.headers || {}) };
-  const authHeader = buildAuthHeader(opts.auth || getDefaultAuth());
+  const authHeader = buildAuthHeader(auth);
   if (authHeader) headers["authorization"] = authHeader;
 
+  applyTlsEnv(auth);
+
   try {
-    const resp = await fetch(url, {
-      method: "GET",
-      headers,
-      signal: AbortSignal.timeout(timeoutMs),
-    });
+    const resp = await fetchWithRetry(
+      url,
+      { method: "GET", headers, signal: AbortSignal.timeout(timeoutMs) },
+      extractHost(target),
+      timeoutMs,
+    );
 
     const outHeaders: Record<string, string> = {};
     resp.headers.forEach((v, k) => {
@@ -110,6 +287,7 @@ export async function httpPostForm(
   const base = buildBaseUrl(t);
   const url = new URL(path, base).toString();
   const timeoutMs = opts.timeoutMs ?? 10000;
+  const auth = opts.auth || getDefaultAuth();
   const reqMeta: Record<string, unknown> = { method: "POST", url, host: t.host };
   if (opts.reqId) reqMeta.reqId = opts.reqId;
 
@@ -120,18 +298,20 @@ export async function httpPostForm(
     "content-type": "application/x-www-form-urlencoded",
     ...(opts.headers || {}),
   };
-  const authHeader = buildAuthHeader(opts.auth || getDefaultAuth());
+  const authHeader = buildAuthHeader(auth);
   if (authHeader) headers["authorization"] = authHeader;
 
   const body = new URLSearchParams(form).toString();
 
+  applyTlsEnv(auth);
+
   try {
-    const resp = await fetch(url, {
-      method: "POST",
-      headers,
-      body,
-      signal: AbortSignal.timeout(timeoutMs),
-    });
+    const resp = await fetchWithRetry(
+      url,
+      { method: "POST", headers, body, signal: AbortSignal.timeout(timeoutMs) },
+      extractHost(target),
+      timeoutMs,
+    );
 
     const outHeaders: Record<string, string> = {};
     resp.headers.forEach((v, k) => {
@@ -157,6 +337,7 @@ export async function httpGetBytes(
   const base = buildBaseUrl(t);
   const url = new URL(path, base).toString();
   const timeoutMs = opts.timeoutMs ?? 10000;
+  const auth = opts.auth || getDefaultAuth();
   const reqMeta: Record<string, unknown> = { method: "GET", url, host: t.host };
   if (opts.reqId) reqMeta.reqId = opts.reqId;
 
@@ -164,15 +345,18 @@ export async function httpGetBytes(
   const start = Date.now();
 
   const headers: Record<string, string> = { ...(opts.headers || {}) };
-  const authHeader = buildAuthHeader(opts.auth || getDefaultAuth());
+  const authHeader = buildAuthHeader(auth);
   if (authHeader) headers["authorization"] = authHeader;
 
+  applyTlsEnv(auth);
+
   try {
-    const resp = await fetch(url, {
-      method: "GET",
-      headers,
-      signal: AbortSignal.timeout(timeoutMs),
-    });
+    const resp = await fetchWithRetry(
+      url,
+      { method: "GET", headers, signal: AbortSignal.timeout(timeoutMs) },
+      extractHost(target),
+      timeoutMs,
+    );
 
     const outHeaders: Record<string, string> = {};
     resp.headers.forEach((v, k) => {

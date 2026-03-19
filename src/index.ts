@@ -33,6 +33,16 @@ import {
 } from "./phone.js";
 import { httpGetText } from "./http.js";
 import { discoverPhone } from "./discovery.js";
+import { log } from "./logger.js";
+
+// ── Credential warnings ──────────────────────────────────────────────
+if (process.env.PHONE_USERNAME || process.env.PHONE_PASSWORD) {
+  log.warn("env_credentials_detected", {
+    message:
+      "PHONE_USERNAME/PHONE_PASSWORD are set via environment. " +
+      "Consider using per-request auth params instead for better security isolation.",
+  });
+}
 
 const server = new McpServer({
   name: "cisco-phone",
@@ -43,12 +53,19 @@ const authSchema = z
   .object({
     username: z.string().optional(),
     password: z.string().optional(),
+    tlsInsecure: z
+      .boolean()
+      .optional()
+      .describe("Skip TLS certificate verification (self-signed certs). Overrides PHONE_TLS_INSECURE env."),
   })
   .optional();
 
 const targetSchema = z.object({
   host: z.string().describe("Phone host or URL (e.g. 192.168.125.178 or http://...)"),
-  auth: authSchema.describe("Optional basic auth; defaults to PHONE_USERNAME/PHONE_PASSWORD"),
+  auth: authSchema.describe(
+    "Optional basic auth (overrides PHONE_USERNAME/PHONE_PASSWORD env defaults). " +
+    "Set tlsInsecure: true for self-signed certs."
+  ),
 });
 
 server.tool(

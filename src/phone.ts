@@ -2,6 +2,11 @@ import { parseCiscoXml, asString, asInt, parseIpPort } from "./ciscoXml.js";
 import { httpGetText, httpPostForm, httpGetBytes, type PhoneAuth } from "./http.js";
 import { getCachedCapabilities } from "./discovery.js";
 import { log } from "./logger.js";
+import {
+  PhoneAuthError,
+  PhoneNotSupportedError,
+  PhoneCommandError,
+} from "./errors.js";
 
 export interface DeviceInformation {
   hostName?: string | null;
@@ -58,6 +63,8 @@ export interface StreamingStatistics {
 
 export interface StreamingStatisticsStream extends StreamingStatistics {
   streamIndex: number;
+  /** Present when the stream fetch failed — carries the typed error code and message. */
+  error?: { code: string; message: string };
 }
 
 export interface RtpStatsSummary {
@@ -77,13 +84,27 @@ function top(obj: unknown): Record<string, unknown> {
   return {};
 }
 
+/**
+ * Throw a typed PhoneError based on the HTTP status code returned by a phone endpoint.
+ */
+function throwForStatus(host: string, endpoint: string, status: number): never {
+  if (status === 401 || status === 403) {
+    throw new PhoneAuthError(host, status);
+  }
+  if (status === 404 || status === 405) {
+    throw new PhoneNotSupportedError(host, endpoint, status);
+  }
+  // 5xx and anything else >= 400
+  throw new PhoneCommandError(host, status, `${endpoint} HTTP ${status}`);
+}
+
 export async function getDeviceInformation(host: string, auth?: PhoneAuth, reqId?: string): Promise<DeviceInformation> {
   const start = Date.now();
   log.info("phone_op_start", { op: "getDeviceInformation", host, ...(reqId ? { reqId } : {}) });
   try {
     const resp = await httpGetText(host, "/DeviceInformationX", { auth, reqId });
     if (resp.status >= 400) {
-      throw new Error(`DeviceInformationX HTTP ${resp.status}`);
+      throwForStatus(host, "/DeviceInformationX", resp.status);
     }
     const parsed = top(parseCiscoXml(resp.body));
     const di = top(parsed["DeviceInformation"]);
@@ -110,7 +131,7 @@ export async function getNetworkConfiguration(host: string, auth?: PhoneAuth, re
   try {
     const resp = await httpGetText(host, "/NetworkConfigurationX", { auth, reqId });
     if (resp.status >= 400) {
-      throw new Error(`NetworkConfigurationX HTTP ${resp.status}`);
+      throwForStatus(host, "/NetworkConfigurationX", resp.status);
     }
     const parsed = top(parseCiscoXml(resp.body));
     const nc = top(parsed["NetworkConfiguration"]);
@@ -139,7 +160,7 @@ export async function getPortInformation(host: string, auth?: PhoneAuth, reqId?:
   try {
     const resp = await httpGetText(host, "/PortInformationX", { auth, reqId });
     if (resp.status >= 400) {
-      throw new Error(`PortInformationX HTTP ${resp.status}`);
+      throwForStatus(host, "/PortInformationX", resp.status);
     }
     const parsed = top(parseCiscoXml(resp.body));
     const pi = top(parsed["PortInformation"]);
@@ -166,7 +187,7 @@ export async function getStreamingStatistics(host: string, auth?: PhoneAuth, req
   try {
     const resp = await httpGetText(host, "/StreamingStatisticsX", { auth, reqId });
     if (resp.status >= 400) {
-      throw new Error(`StreamingStatisticsX HTTP ${resp.status}`);
+      throwForStatus(host, "/StreamingStatisticsX", resp.status);
     }
     const parsed = top(parseCiscoXml(resp.body));
     const ss = top(parsed["StreamingStatistics"]);
@@ -235,7 +256,7 @@ export async function getStreamingStatisticsStream(
   const path = `/CGI/Java/Serviceability?adapter=device.statistics.streaming.${streamIndex}`;
   const resp = await httpGetText(host, path, { auth });
   if (resp.status >= 400) {
-    throw new Error(`streaming.${streamIndex} HTTP ${resp.status}`);
+    throwForStatus(host, `/CGI/Java/Serviceability?streaming.${streamIndex}`, resp.status);
   }
 
   const remoteAddrRaw = extractBoldValue(resp.body, "Remote Address");
@@ -315,7 +336,16 @@ export async function getStreamingStatisticsAllStreams(host: string, auth?: Phon
     if (result.status === "fulfilled") {
       return result.value;
     }
-    return { streamIndex: i, streamStatus: "ERROR", localAddrRaw: null, remoteAddrRaw: null } as StreamingStatisticsStream;
+    const reason = result.reason;
+    const errCode = reason && typeof reason === "object" && "code" in reason ? String(reason.code) : "UNKNOWN";
+    const errMsg = reason instanceof Error ? reason.message : String(reason);
+    return {
+      streamIndex: i,
+      streamStatus: "ERROR",
+      localAddrRaw: null,
+      remoteAddrRaw: null,
+      error: { code: errCode, message: errMsg },
+    } as StreamingStatisticsStream;
   });
 }
 
