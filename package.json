@@ -33,7 +33,7 @@
   "author": "CallTelemetry",
   "license": "MIT",
   "dependencies": {
-    "@modelcontextprotocol/sdk": "^1.28.0",
+    "@modelcontextprotocol/sdk": "^1.29.0",
     "fast-xml-parser": "^4.5.5",
     "zod": "^4.3.6"
   },
