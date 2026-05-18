@@ -17,10 +17,10 @@ __metadata:
   resolution: "@calltelemetry/cisco-phone-mcp@workspace:."
   dependencies:
     "@modelcontextprotocol/sdk": "npm:^1.29.0"
-    "@types/node": "npm:^25.8.0"
+    "@types/node": "npm:^25.9.0"
     c8: "npm:^11.0.0"
     fast-xml-parser: "npm:^4.5.6"
-    tsx: "npm:^4.22.1"
+    tsx: "npm:^4.22.2"
     typescript: "npm:^5.9.3"
     zod: "npm:^4.4.3"
   bin:
@@ -299,12 +299,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:^25.8.0":
-  version: 25.8.0
-  resolution: "@types/node@npm:25.8.0"
+"@types/node@npm:^25.9.0":
+  version: 25.9.0
+  resolution: "@types/node@npm:25.9.0"
   dependencies:
     undici-types: "npm:>=7.24.0 <7.24.7"
-  checksum: 10c0/ff53e5428309d2e6060190ec5e02afd0e4a7369456b16130a7f5898f12a6ad0efd62d752830f2f7355d714ae429bc0acbb2dc0cbf761cadb03e88c4996cdf1dc
+  checksum: 10c0/1845f0ce5471213a4f0c887845c50993968ea863c03bb355282b59bdcc877d009a2785f0f506cfc40b8ce7548a21e33ac826e998be62d42b000bfd9ccdc6c910
   languageName: node
   linkType: hard
 
@@ -1678,9 +1678,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tsx@npm:^4.22.1":
-  version: 4.22.1
-  resolution: "tsx@npm:4.22.1"
+"tsx@npm:^4.22.2":
+  version: 4.22.2
+  resolution: "tsx@npm:4.22.2"
   dependencies:
     esbuild: "npm:~0.28.0"
     fsevents: "npm:~2.3.3"
@@ -1689,7 +1689,7 @@ __metadata:
       optional: true
   bin:
     tsx: dist/cli.mjs
-  checksum: 10c0/ca9f777c404d71faa827731da2097f7042d25decfc59b7cc9a6d1a33fe46eaf586bb4e1f73b271a2f80fd5aaeebf5f0f5b13bde0290f2773d9eaaa78b4dc9018
+  checksum: 10c0/5e9a9b5577642b6084bac14450379bdb72567a9bf47b3508470f3ccd530693358ab0c5eb86c57c249260f2ffa0549e2e4cedc93cbe526bbae5ef4d215e1d57a3
   languageName: node
   linkType: hard
 
