@@ -1,0 +1,46 @@
+name: Update Dependencies
+
+on:
+  schedule:
+    - cron: '0 0 * * 1' # Every Monday at 00:00
+  workflow_dispatch:
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'yarn'
+
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Update Dependencies
+        run: |
+          npx npm-check-updates -u --target minor
+          yarn install
+          yarn dedupe
+
+      - name: Verify Builds and Tests
+        run: |
+          yarn build
+          yarn typecheck
+          yarn test
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "chore: update minor project dependencies"
+          title: "chore: update minor project dependencies"
+          body: |
+            This PR updates all project dependencies to their latest minor/patch versions.
+
+            This update was performed via `npm-check-updates -u --target minor` and verified with full test suite passes.
+          branch: update-dependencies
+          base: main
