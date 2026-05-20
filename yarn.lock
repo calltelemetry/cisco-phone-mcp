@@ -16,13 +16,13 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@calltelemetry/cisco-phone-mcp@workspace:."
   dependencies:
-    "@modelcontextprotocol/sdk": "npm:^1.29.0"
-    "@types/node": "npm:^25.9.0"
-    c8: "npm:^11.0.0"
-    fast-xml-parser: "npm:^4.5.6"
-    tsx: "npm:^4.22.3"
-    typescript: "npm:^5.9.3"
-    zod: "npm:^4.4.3"
+    "@modelcontextprotocol/sdk": "npm:~1.29.0"
+    "@types/node": "npm:~25.9.1"
+    c8: "npm:~11.0.0"
+    fast-xml-parser: "npm:~4.5.6"
+    tsx: "npm:~4.22.3"
+    typescript: "npm:~5.9.3"
+    zod: "npm:~4.4.3"
   bin:
     cisco-phone-mcp: dist/index.js
   languageName: unknown
@@ -259,7 +259,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@modelcontextprotocol/sdk@npm:^1.29.0":
+"@modelcontextprotocol/sdk@npm:~1.29.0":
   version: 1.29.0
   resolution: "@modelcontextprotocol/sdk@npm:1.29.0"
   dependencies:
@@ -299,7 +299,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:^25.9.0":
+"@types/node@npm:~25.9.1":
   version: 25.9.1
   resolution: "@types/node@npm:25.9.1"
   dependencies:
@@ -421,7 +421,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"c8@npm:^11.0.0":
+"c8@npm:~11.0.0":
   version: 11.0.0
   resolution: "c8@npm:11.0.0"
   dependencies:
@@ -839,7 +839,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"fast-xml-parser@npm:^4.5.6":
+"fast-xml-parser@npm:~4.5.6":
   version: 4.5.6
   resolution: "fast-xml-parser@npm:4.5.6"
   dependencies:
@@ -1678,7 +1678,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"tsx@npm:^4.22.3":
+"tsx@npm:~4.22.3":
   version: 4.22.3
   resolution: "tsx@npm:4.22.3"
   dependencies:
@@ -1704,7 +1704,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@npm:^5.9.3":
+"typescript@npm:~5.9.3":
   version: 5.9.3
   resolution: "typescript@npm:5.9.3"
   bin:
@@ -1714,7 +1714,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@patch:typescript@npm%3A^5.9.3#optional!builtin<compat/typescript>":
+"typescript@patch:typescript@npm%3A~5.9.3#optional!builtin<compat/typescript>":
   version: 5.9.3
   resolution: "typescript@patch:typescript@npm%3A5.9.3#optional!builtin<compat/typescript>::version=5.9.3&hash=5786d5"
   bin:
@@ -1855,7 +1855,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"zod@npm:^3.25 || ^4.0, zod@npm:^4.4.3":
+"zod@npm:^3.25 || ^4.0, zod@npm:~4.4.3":
   version: 4.4.3
   resolution: "zod@npm:4.4.3"
   checksum: 10c0/7ea31b558e88f9faf44f31dd185e2e1cbf51fed3081787fb96cc2534749b50c0acfc6da7f0922a7353ed092dd358c7d50c28ea96c94d04af64191bd33152eca3
