@@ -1030,9 +1030,9 @@ __metadata:
   linkType: hard
 
 "hono@npm:^4.11.4":
-  version: 4.12.21
-  resolution: "hono@npm:4.12.21"
-  checksum: 10c0/2d26049eadc7dc879f7a442e127bea5c896b029050dc9fb81c950c190d5bd15da66a161b5132331451584d6a596a59162200f8840e796ddb9ae34a0e358e48a7
+  version: 4.12.22
+  resolution: "hono@npm:4.12.22"
+  checksum: 10c0/5a6cf6cb63c892978eadca0b2e32d8a9adee020228e7cb66349eaacc5fa493ce2943fc8715f1c8f10a5280e9639f10d6c539f00475dba455a8178c5773407443
   languageName: node
   linkType: hard
 
@@ -1477,11 +1477,11 @@ __metadata:
   linkType: hard
 
 "semver@npm:^7.3.5, semver@npm:^7.5.3":
-  version: 7.8.0
-  resolution: "semver@npm:7.8.0"
+  version: 7.8.1
+  resolution: "semver@npm:7.8.1"
   bin:
     semver: bin/semver.js
-  checksum: 10c0/8f096ca9b80ffd47b308d03f9ce8c873e27e2983f36023c559cdc92c51e8433fc23ebbfe57ec9623fc155636a6961ee989501099841ae4bb1babc8d2b3f048cd
+  checksum: 10c0/92d6871d6347e1f99d0ba396a70f2545ccf2a032cda3d378fa0699edf7506b5c6d266aed55c8b88e72bd91a30d2351e4f39db479375374430fcdc4b58f4e3c1a
   languageName: node
   linkType: hard
 
