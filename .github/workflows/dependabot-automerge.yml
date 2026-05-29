@@ -1,19 +1,25 @@
 name: Dependabot auto-merge
 
-# Auto-enable GitHub merge-queue ("--auto") for Dependabot patch/minor PRs.
+# Auto-enable GitHub auto-merge ("--auto") for Dependabot patch/minor PRs.
 # The PR still only merges once branch protection's required checks
-# (test (20), test (22)) pass. Only acts on the trusted dependabot[bot]
-# actor; nothing here runs or trusts third-party PR code.
+# (test (20), test (22)) pass. Gated to the trusted dependabot[bot] actor
+# AND author; on: pull_request (not pull_request_target); never runs or
+# trusts third-party PR code.
 on: pull_request
 
-permissions:
-  contents: write
-  pull-requests: write
+concurrency:
+  group: dependabot-automerge-${{ github.event.pull_request.number }}
+  cancel-in-progress: false
 
 jobs:
   dependabot:
+    name: Auto-merge Dependabot patch/minor PRs
     runs-on: ubuntu-latest
-    if: github.actor == 'dependabot[bot]'
+    # Verify both the triggering actor and the PR author to avoid actor spoofing.
+    if: github.actor == 'dependabot[bot]' && github.event.pull_request.user.login == 'dependabot[bot]'
+    permissions:
+      contents: write
+      pull-requests: write
     steps:
       - name: Fetch Dependabot metadata
         id: metadata
