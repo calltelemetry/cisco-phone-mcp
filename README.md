@@ -245,6 +245,10 @@ npm test
 
 - **[cisco-axl-mcp](https://github.com/calltelemetry/cisco-axl-mcp)** — CUCM AXL admin operations via MCP (phones, users, route patterns)
 
+## Code review
+
+Pull requests in this repository are reviewed automatically by Review Yeti, Call Telemetry's GitHub App reviewer. Its verdict is advisory: it is not a required status check, and branch protection is unchanged.
+
 ## License
 
 MIT — see [LICENSE](LICENSE) for details.
