@@ -41,3 +41,4 @@ jobs:
           name: coverage-node-${{ matrix.node-version }}
           path: coverage/
           retention-days: 14
+# REL-1119 guard canary (jules-guard-canary-rel1119) - do not merge
