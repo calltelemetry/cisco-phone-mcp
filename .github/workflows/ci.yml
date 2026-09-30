@@ -6,9 +6,24 @@ on:
   pull_request:
     branches: [main]
 
+permissions:
+  contents: read
+
 jobs:
   test:
-    if: github.actor != 'dependabot[bot]'
+    # REL-1119 follow-up: this job used to be skipped for Dependabot with
+    #   if: github.actor != 'dependabot[bot]'
+    # and branch protection on main REQUIRES the contexts `test (20)` and
+    # `test (22)` produced by this matrix. A skipped job never reports those
+    # contexts, so every Dependabot PR was permanently unmergeable (PR #99
+    # documents the same deadlock; PR #95 only landed via a human admin merge).
+    #
+    # The skip never provided any safety: this workflow runs on `pull_request`,
+    # never on `pull_request_target`, so it has no repository secrets and no
+    # write token, and a Dependabot PR's code cannot reach anything privileged
+    # that an ordinary contributor PR could not. Removing it restores real
+    # typecheck/coverage evidence on dependency bumps instead of accepting them
+    # untested.
     runs-on: blacksmith-2vcpu-ubuntu-2404
     strategy:
       matrix:
