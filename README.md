@@ -252,5 +252,3 @@ Pull requests in this repository are reviewed automatically by Review Yeti, Call
 ## License
 
 MIT — see [LICENSE](LICENSE) for details.
-
-<!-- merge-queue canary 2026-10-25 -->
