@@ -57,4 +57,4 @@ jobs:
         with:
           name: coverage-node-${{ matrix.node-version }}
           path: coverage/
-          retention-days: 14
+          retention-days: 1
