@@ -13,7 +13,11 @@ on:
 
 jobs:
   publish:
-    runs-on: ubuntu-latest
+    # npm trusted publishing needs a GitHub-hosted runner. This repository is
+    # public, where `ubuntu-latest` is 4 vCPU; the org runner cap is 2 vCPU, so
+    # use the 1 vCPU `ubuntu-slim` (job limit 15 minutes).
+    runs-on: ubuntu-slim
+    timeout-minutes: 15
     permissions:
       contents: write # gh release create
       id-token: write # npm trusted publishing (OIDC) and provenance
