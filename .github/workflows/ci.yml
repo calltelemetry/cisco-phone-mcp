@@ -10,6 +10,7 @@ on:
 
 permissions:
   contents: read
+  actions: write
 
 jobs:
   test:
@@ -63,6 +64,24 @@ jobs:
           name: coverage-node-${{ matrix.node-version }}
           path: coverage/
           retention-days: 1
+
+      - name: Prune superseded coverage artifacts
+        if: always()
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          NAME: coverage-node-${{ matrix.node-version }}
+        run: |
+          set -euo pipefail
+          artifacts="$(gh api "repos/${REPO}/actions/artifacts?name=${NAME}&per_page=100" --jq '.artifacts[] | select(.expired == false) | .id' 2>/dev/null || true)"
+          if [[ -n "$artifacts" ]]; then
+            tail -n +3 <<< "$artifacts" | while IFS= read -r art_id; do
+              [[ -z "$art_id" ]] && continue
+              echo "Pruning superseded artifact ${art_id} (${NAME})"
+              gh api -X DELETE "repos/${REPO}/actions/artifacts/${art_id}" >/dev/null 2>&1 || true
+            done
+          fi
 
       - name: Build
         run: yarn build
