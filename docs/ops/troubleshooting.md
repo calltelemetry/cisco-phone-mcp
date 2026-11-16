@@ -17,13 +17,13 @@ Common issues and solutions for the Phone MCP server.
 
 ```bash
 # Test basic connectivity
-ping 192.168.1.100
+ping 192.0.2.100
 
 # Test HTTP access
-curl -v http://192.168.1.100/
+curl -v http://192.0.2.100/
 
 # Check if phone responds
-curl -I http://192.168.1.100/DeviceInformationX
+curl -I http://192.0.2.100/DeviceInformationX
 ```
 
 **CUCM Fix:**
@@ -47,7 +47,7 @@ curl -I http://192.168.1.100/DeviceInformationX
 2. **Pass auth in request:**
    ```typescript
    await mcp__phone__get_device_information({
-     host: "192.168.1.100",
+     host: "192.0.2.100",
      auth: { username: "admin", password: "password" }
    });
    ```
@@ -70,7 +70,7 @@ curl -I http://192.168.1.100/DeviceInformationX
 1. **Increase timeout:**
    ```typescript
    await mcp__phone__health({
-     host: "192.168.1.100",
+     host: "192.0.2.100",
      timeoutMs: 30000
    });
    ```
@@ -95,7 +95,7 @@ curl -I http://192.168.1.100/DeviceInformationX
 ```typescript
 // Check if call is active
 const stats = await mcp__phone__get_streaming_statistics({
-  host: "192.168.1.100"
+  host: "192.0.2.100"
 });
 
 if (stats.streamStatus !== "Active") {
@@ -104,7 +104,7 @@ if (stats.streamStatus !== "Active") {
 
 // Try all streams
 const allStreams = await mcp__phone__get_streaming_statistics_all_streams({
-  host: "192.168.1.100"
+  host: "192.0.2.100"
 });
 const activeStream = allStreams.find(s => s.streamStatus === "Active");
 ```
@@ -122,7 +122,7 @@ const activeStream = allStreams.find(s => s.streamStatus === "Active");
 ```bash
 # Test Serviceability access directly
 curl -u admin:password \
-  "http://192.168.1.100/CGI/Java/Serviceability?adapter=device.statistics.streaming.0"
+  "http://192.0.2.100/CGI/Java/Serviceability?adapter=device.statistics.streaming.0"
 ```
 
 ## Screenshot Issues
@@ -141,7 +141,7 @@ curl -u admin:password \
 1. **Use auto-detect:**
    ```typescript
    await mcp__phone__screenshot_auto({
-     host: "192.168.1.100",
+     host: "192.0.2.100",
      modelHint: "Cisco 7975"  // Help with detection
    });
    ```
@@ -157,7 +157,7 @@ curl -u admin:password \
 
 3. **Check if HTTPS needed:**
    ```bash
-   curl -k https://192.168.1.100/CGI/Screenshot -o screenshot.png
+   curl -k https://192.0.2.100/CGI/Screenshot -o screenshot.png
    ```
 
 ### Screenshot Authentication
@@ -168,7 +168,7 @@ Some phones require auth specifically for screenshots:
 
 ```typescript
 await mcp__phone__screenshot({
-  host: "192.168.1.100",
+  host: "192.0.2.100",
   auth: {
     username: "admin",
     password: "password"
@@ -192,14 +192,14 @@ await mcp__phone__screenshot({
 ```typescript
 // Ensure speaker is activated
 await mcp__phone__dial({
-  host: "192.168.1.100",
+  host: "192.0.2.100",
   digits: "9005551234",
   speaker: true  // Explicitly enable
 });
 
 // Or use raw execute
 await mcp__phone__execute({
-  host: "192.168.1.100",
+  host: "192.0.2.100",
   urls: ["Key:Speaker", "Dial:9005551234"]
 });
 ```
@@ -213,13 +213,13 @@ await mcp__phone__execute({
 ```typescript
 // Use multiple presses
 await mcp__phone__end_call({
-  host: "192.168.1.100",
+  host: "192.0.2.100",
   repeat: 3
 });
 
 // Or raw execute
 await mcp__phone__execute({
-  host: "192.168.1.100",
+  host: "192.0.2.100",
   urls: ["Key:EndCall", "Key:EndCall", "Key:EndCall"]
 });
 ```
@@ -239,7 +239,7 @@ await mcp__phone__execute({
 ```typescript
 // Use raw_get to see actual response
 const resp = await mcp__phone__raw_get({
-  host: "192.168.1.100",
+  host: "192.0.2.100",
   path: "/DeviceInformationX"
 });
 console.log(resp.body);  // Inspect raw response
@@ -253,13 +253,13 @@ console.log(resp.body);  // Inspect raw response
 
 ```bash
 # Use HTTPS
-curl -k https://192.168.1.100/CGI/Screenshot
+curl -k https://192.0.2.100/CGI/Screenshot
 ```
 
 ```typescript
 // Pass full URL
 await mcp__phone__screenshot({
-  host: "https://192.168.1.100"
+  host: "https://192.0.2.100"
 });
 ```
 
@@ -269,7 +269,7 @@ await mcp__phone__screenshot({
 
 ```typescript
 await mcp__phone__screenshot({
-  host: "192.168.1.100",
+  host: "192.0.2.100",
   path: "/CGI/lcd.bmp"
 });
 ```
@@ -278,25 +278,25 @@ await mcp__phone__screenshot({
 
 ```bash
 # 1. Test basic connectivity
-ping 192.168.1.100
+ping 192.0.2.100
 
 # 2. Test HTTP access
-curl -v http://192.168.1.100/
+curl -v http://192.0.2.100/
 
 # 3. Test device info (no auth)
-curl http://192.168.1.100/DeviceInformationX
+curl http://192.0.2.100/DeviceInformationX
 
 # 4. Test device info (with auth)
-curl -u admin:password http://192.168.1.100/DeviceInformationX
+curl -u admin:password http://192.0.2.100/DeviceInformationX
 
 # 5. Test streaming stats
-curl http://192.168.1.100/StreamingStatisticsX
+curl http://192.0.2.100/StreamingStatisticsX
 
 # 6. Test screenshot
-curl -o /tmp/screenshot.png http://192.168.1.100/CGI/Screenshot
+curl -o /tmp/screenshot.png http://192.0.2.100/CGI/Screenshot
 
 # 7. Check model
-curl http://192.168.1.100/DeviceInformationX | grep modelNumber
+curl http://192.0.2.100/DeviceInformationX | grep modelNumber
 ```
 
 ## Environment Checklist

@@ -8,31 +8,31 @@ import { normalizeTarget, buildBaseUrl, httpGetText } from "../src/http.js";
 // --- normalizeTarget ---
 
 test("http: normalizeTarget/buildBaseUrl handle scheme and port", () => {
-  assert.deepEqual(normalizeTarget("192.168.1.10"), { host: "192.168.1.10", protocol: "http", port: undefined });
-  assert.deepEqual(normalizeTarget("http://phone.local"), { host: "phone.local", protocol: "http", port: undefined });
-  assert.deepEqual(normalizeTarget("https://phone.local:8443"), { host: "phone.local", protocol: "https", port: 8443 });
+  assert.deepEqual(normalizeTarget("192.0.2.10"), { host: "192.0.2.10", protocol: "http", port: undefined });
+  assert.deepEqual(normalizeTarget("http://phone.example.com"), { host: "phone.example.com", protocol: "http", port: undefined });
+  assert.deepEqual(normalizeTarget("https://phone.example.com:8443"), { host: "phone.example.com", protocol: "https", port: 8443 });
 
   assert.equal(buildBaseUrl({ host: "x", protocol: "http" }), "http://x");
   assert.equal(buildBaseUrl({ host: "x", protocol: "https", port: 8443 }), "https://x:8443");
 });
 
 test("http: normalizeTarget handles bare IP with port (host:port)", () => {
-  const result = normalizeTarget("192.168.1.10:8080");
-  assert.equal(result.host, "192.168.1.10");
+  const result = normalizeTarget("192.0.2.10:8080");
+  assert.equal(result.host, "192.0.2.10");
   assert.equal(result.port, 8080);
   assert.equal(result.protocol, "http");
 });
 
 test("http: normalizeTarget handles hostname without scheme", () => {
-  const result = normalizeTarget("phone.local");
-  assert.equal(result.host, "phone.local");
+  const result = normalizeTarget("phone.example.com");
+  assert.equal(result.host, "phone.example.com");
   assert.equal(result.protocol, "http");
   assert.equal(result.port, undefined);
 });
 
 test("http: normalizeTarget handles https URL without port", () => {
-  const result = normalizeTarget("https://10.0.0.1");
-  assert.equal(result.host, "10.0.0.1");
+  const result = normalizeTarget("https://203.0.113.1");
+  assert.equal(result.host, "203.0.113.1");
   assert.equal(result.protocol, "https");
   assert.equal(result.port, undefined);
 });
@@ -40,11 +40,11 @@ test("http: normalizeTarget handles https URL without port", () => {
 // --- buildBaseUrl ---
 
 test("http: buildBaseUrl defaults to http when protocol is undefined", () => {
-  assert.equal(buildBaseUrl({ host: "phone.local" }), "http://phone.local");
+  assert.equal(buildBaseUrl({ host: "phone.example.com" }), "http://phone.example.com");
 });
 
 test("http: buildBaseUrl omits port when undefined", () => {
-  assert.equal(buildBaseUrl({ host: "phone.local", protocol: "https" }), "https://phone.local");
+  assert.equal(buildBaseUrl({ host: "phone.example.com", protocol: "https" }), "https://phone.example.com");
 });
 
 // --- httpGetText ---
@@ -57,7 +57,7 @@ test("http: httpGetText uses default auth env vars when present", async () => {
 
   try {
     const h = withMockFetch(async () => {
-      const r = await httpGetText("192.168.125.178", "/");
+      const r = await httpGetText("198.51.100.178", "/");
       assert.equal(r.status, 200);
     });
 
@@ -76,7 +76,7 @@ test("http: httpGetText uses default auth env vars when present", async () => {
 
 test("http: httpGetText returns body, status, and lowercase headers", async () => {
   const h = withMockFetch(async () => {
-    const r = await httpGetText("192.168.125.178", "/DeviceInformationX");
+    const r = await httpGetText("198.51.100.178", "/DeviceInformationX");
     assert.equal(r.status, 200);
     assert.equal(r.body, "<xml>data</xml>");
     assert.equal(r.headers["content-type"], "text/xml");
@@ -89,11 +89,11 @@ test("http: httpGetText returns body, status, and lowercase headers", async () =
 
 test("http: httpGetText constructs correct URL from host and path", async () => {
   const h = withMockFetch(async () => {
-    await httpGetText("https://phone.local:8443", "/DeviceInformationX");
+    await httpGetText("https://phone.example.com:8443", "/DeviceInformationX");
   });
 
   await h.run(async (url) => {
-    assert.equal(url, "https://phone.local:8443/DeviceInformationX");
+    assert.equal(url, "https://phone.example.com:8443/DeviceInformationX");
     return responseText("ok", { status: 200 });
   });
 });

@@ -35,13 +35,13 @@ Returns network settings.
 <?xml version="1.0" encoding="utf-8"?>
 <NetworkConfiguration>
   <HostName>SEP001122334455</HostName>
-  <IPAddress>192.168.125.178</IPAddress>
+  <IPAddress>198.51.100.178</IPAddress>
   <SubNetMask>255.255.255.0</SubNetMask>
-  <DefaultRouter1>192.168.125.1</DefaultRouter1>
+  <DefaultRouter1>198.51.100.1</DefaultRouter1>
   <DomainName>example.com</DomainName>
-  <DNSServer1>192.168.125.10</DNSServer1>
-  <TFTPServer1>192.168.125.10</TFTPServer1>
-  <CallManager1>192.168.125.10</CallManager1>
+  <DNSServer1>198.51.100.10</DNSServer1>
+  <TFTPServer1>198.51.100.10</TFTPServer1>
+  <CallManager1>198.51.100.10</CallManager1>
 </NetworkConfiguration>
 ```
 
@@ -55,10 +55,10 @@ Returns CDP/LLDP neighbor information.
 <PortInformation>
   <PortSpeed>1000 Full</PortSpeed>
   <CDPNeighborDeviceId>switch01.example.com</CDPNeighborDeviceId>
-  <CDPNeighborIP>192.168.125.1</CDPNeighborIP>
+  <CDPNeighborIP>198.51.100.1</CDPNeighborIP>
   <CDPNeighborPort>GigabitEthernet1/0/1</CDPNeighborPort>
   <LLDPNeighborDeviceId>switch01</LLDPNeighborDeviceId>
-  <LLDPNeighborIP>192.168.125.1</LLDPNeighborIP>
+  <LLDPNeighborIP>198.51.100.1</LLDPNeighborIP>
   <LLDPNeighborPort>Gi1/0/1</LLDPNeighborPort>
 </PortInformation>
 ```
@@ -71,8 +71,8 @@ Returns RTP streaming statistics for the primary stream.
 ```xml
 <?xml version="1.0" encoding="utf-8"?>
 <StreamingStatistics>
-  <RemoteAddr>192.168.125.100/16384</RemoteAddr>
-  <LocalAddr>192.168.125.178/24576</LocalAddr>
+  <RemoteAddr>198.51.100.100/16384</RemoteAddr>
+  <LocalAddr>198.51.100.178/24576</LocalAddr>
   <StreamStatus>Active</StreamStatus>
   <Name>SEP001122334455</Name>
   <SenderPackets>1500</SenderPackets>
@@ -214,10 +214,10 @@ Authorization: Basic <base64(username:password)>
 
 ```bash
 # Check if auth is required
-curl -v http://192.168.1.100/DeviceInformationX
+curl -v http://192.0.2.100/DeviceInformationX
 
 # Try with credentials
-curl -u admin:password http://192.168.1.100/DeviceInformationX
+curl -u admin:password http://192.0.2.100/DeviceInformationX
 ```
 
 ### 404 Not Found

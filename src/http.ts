@@ -90,9 +90,9 @@ export function normalizeTarget(target: string | PhoneTarget): PhoneTarget {
   if (typeof target !== "string") return target;
 
   // Accept:
-  // - "192.168.1.10"
-  // - "http://192.168.1.10"
-  // - "https://phone.local:8443"
+  // - "192.0.2.10"
+  // - "http://192.0.2.10"
+  // - "https://phone.example.com:8443"
   try {
     const u = new URL(target.includes("://") ? target : `http://${target}`);
     return {

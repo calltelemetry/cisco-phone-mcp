@@ -8,8 +8,8 @@ import { getStreamingStatistics, getStreamingStatisticsStream, getRtpStats } fro
 test("phone: getStreamingStatistics parses StreamingStatisticsX", async () => {
   const xml = `<?xml version="1.0" encoding="utf-8"?>
 <StreamingStatistics>
-  <RemoteAddr>192.168.125.10/20000</RemoteAddr>
-  <LocalAddr>192.168.125.178/34567</LocalAddr>
+  <RemoteAddr>198.51.100.10/20000</RemoteAddr>
+  <LocalAddr>198.51.100.178/34567</LocalAddr>
   <StreamStatus>Active</StreamStatus>
   <SenderPackets>111</SenderPackets>
   <SenderOctets>222</SenderOctets>
@@ -25,20 +25,20 @@ test("phone: getStreamingStatistics parses StreamingStatisticsX", async () => {
 </StreamingStatistics>`;
 
   const h = withMockFetch(async () => {
-    const ss = await getStreamingStatistics("192.168.125.178");
-    assert.equal(ss.remoteAddrRaw, "192.168.125.10/20000");
-    assert.equal(ss.localAddrRaw, "192.168.125.178/34567");
+    const ss = await getStreamingStatistics("198.51.100.178");
+    assert.equal(ss.remoteAddrRaw, "198.51.100.10/20000");
+    assert.equal(ss.localAddrRaw, "198.51.100.178/34567");
     assert.equal(ss.streamStatus, "Active");
     assert.equal(ss.senderPackets, 111);
     assert.equal(ss.rcvrPackets, 333);
     assert.equal(ss.rcvrLostPackets, 5);
     assert.equal(ss.mosLqk, 4.32);
 
-    const summary = await getRtpStats("192.168.125.178");
-    assert.equal(summary.remote!.host, "192.168.125.10");
+    const summary = await getRtpStats("198.51.100.178");
+    assert.equal(summary.remote!.host, "198.51.100.10");
     assert.equal(summary.remote!.port, 20000);
-    assert.equal(summary.local!.host, "192.168.125.178");
-    assert.equal(summary.local!.port, 34567);
+    assert.equal(summary["local"]!.host, "198.51.100.178");
+    assert.equal(summary["local"]!.port, 34567);
     assert.equal(summary.rxPackets, 333);
   });
 
@@ -54,8 +54,8 @@ test("phone: getStreamingStatisticsStream parses Serviceability HTML stream", as
   const html = `
 <HTML><BODY>
 <TABLE>
-<TR><TD><B> Remote Address </B></TD><TD><B>192.168.125.10/20000</B></TD></TR>
-<TR><TD><B> Local Address </B></TD><TD><B>192.168.125.178/34567</B></TD></TR>
+<TR><TD><B> Remote Address </B></TD><TD><B>198.51.100.10/20000</B></TD></TR>
+<TR><TD><B> Local Address </B></TD><TD><B>198.51.100.178/34567</B></TD></TR>
 <TR><TD><B> Stream Status </B></TD><TD><B>Active</B></TD></TR>
 <TR><TD><B> Sender Packets </B></TD><TD><B>111</B></TD></TR>
 <TR><TD><B> Sender Octets </B></TD><TD><B>222</B></TD></TR>
@@ -72,10 +72,10 @@ test("phone: getStreamingStatisticsStream parses Serviceability HTML stream", as
 </BODY></HTML>`;
 
   const h = withMockFetch(async () => {
-    const ss = await getStreamingStatisticsStream("192.168.125.178", 0);
+    const ss = await getStreamingStatisticsStream("198.51.100.178", 0);
     assert.equal(ss.streamIndex, 0);
-    assert.equal(ss.remoteAddrRaw, "192.168.125.10/20000");
-    assert.equal(ss.localAddrRaw, "192.168.125.178/34567");
+    assert.equal(ss.remoteAddrRaw, "198.51.100.10/20000");
+    assert.equal(ss.localAddrRaw, "198.51.100.178/34567");
     assert.equal(ss.streamStatus, "Active");
     assert.equal(ss.senderPackets, 111);
     assert.equal(ss.rcvrPackets, 333);
@@ -95,8 +95,8 @@ test("phone: getStreamingStatisticsStream tolerates Receiver packets label varia
   const html = `
 <HTML><BODY>
 <TABLE>
-<TR><TD><B> Remote Address </B></TD><TD><B>192.168.125.10/20000</B></TD></TR>
-<TR><TD><B> Local Address </B></TD><TD><B>192.168.125.178/34567</B></TD></TR>
+<TR><TD><B> Remote Address </B></TD><TD><B>198.51.100.10/20000</B></TD></TR>
+<TR><TD><B> Local Address </B></TD><TD><B>198.51.100.178/34567</B></TD></TR>
 <TR><TD><B> Stream Status </B></TD><TD><B>Active</B></TD></TR>
 <TR><TD><B> Sender Packets </B></TD><TD><B>111</B></TD></TR>
 <TR><TD><B> Sender Octets </B></TD><TD><B>222</B></TD></TR>
@@ -109,7 +109,7 @@ test("phone: getStreamingStatisticsStream tolerates Receiver packets label varia
 </BODY></HTML>`;
 
   const h = withMockFetch(async () => {
-    const ss = await getStreamingStatisticsStream("192.168.125.178", 0);
+    const ss = await getStreamingStatisticsStream("198.51.100.178", 0);
     assert.equal(ss.rcvrPackets, 333);
     assert.equal(ss.rcvrOctets, 444);
     assert.equal(ss.rcvrCodec, "G711u");

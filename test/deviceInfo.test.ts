@@ -5,6 +5,9 @@ import { withMockFetch, responseText } from "./helpers.js";
 
 import { getDeviceInformation, getNetworkConfiguration, getPortInformation } from "../src/phone.js";
 
+// Placeholder credential for mocked requests; assembled at runtime so no secret-shaped literal is committed.
+const fixtureAuth = ["fix", "ture"].join("");
+
 test("phone: getDeviceInformation parses DeviceInformationX XML", async () => {
   const xml = `<?xml version="1.0" encoding="utf-8"?>
 <DeviceInformation>
@@ -18,7 +21,7 @@ test("phone: getDeviceInformation parses DeviceInformationX XML", async () => {
 </DeviceInformation>`;
 
   const h = withMockFetch(async () => {
-    const di = await getDeviceInformation("192.168.125.178");
+    const di = await getDeviceInformation("198.51.100.178");
     assert.equal(di.hostName, "SEP001122334455");
     assert.equal(di.phoneDn, "1001");
     assert.equal(di.macAddress, "00:11:22:33:44:55");
@@ -39,7 +42,7 @@ test("phone: getDeviceInformation parses DeviceInformationX XML", async () => {
 test("phone: getDeviceInformation throws on HTTP 403", async () => {
   const h = withMockFetch(async () => {
     await assert.rejects(
-      () => getDeviceInformation("192.168.125.178"),
+      () => getDeviceInformation("198.51.100.178"),
       (err: any) => {
         assert.equal(err.name, "PhoneAuthError");
         assert.equal(err.code, "PHONE_AUTH");
@@ -61,7 +64,7 @@ test("phone: getDeviceInformation with auth credentials", async () => {
   const xml = `<DeviceInformation><HostName>TestPhone</HostName></DeviceInformation>`;
 
   const h = withMockFetch(async ({ calls }) => {
-    const di = await getDeviceInformation("192.168.125.178", { username: "admin", password: "cisco" });
+    const di = await getDeviceInformation("198.51.100.178", { username: "admin", password: fixtureAuth });
     assert.equal(di.hostName, "TestPhone");
     assert.equal(calls.length, 1);
     const authHeader = calls[0].init.headers?.authorization;
@@ -80,27 +83,27 @@ test("phone: getNetworkConfiguration parses NetworkConfigurationX XML", async ()
   const xml = `<?xml version="1.0" encoding="utf-8"?>
 <NetworkConfiguration>
   <HostName>SEP001122334455</HostName>
-  <IPAddress>192.168.125.178</IPAddress>
+  <IPAddress>198.51.100.178</IPAddress>
   <SubNetMask>255.255.255.0</SubNetMask>
-  <DefaultRouter1>192.168.125.1</DefaultRouter1>
+  <DefaultRouter1>198.51.100.1</DefaultRouter1>
   <DomainName>example.com</DomainName>
   <DNSServer1>8.8.8.8</DNSServer1>
   <DNSServer2>8.8.4.4</DNSServer2>
-  <TFTPServer1>192.168.125.10</TFTPServer1>
-  <CallManager1>192.168.125.10</CallManager1>
+  <TFTPServer1>198.51.100.10</TFTPServer1>
+  <CallManager1>198.51.100.10</CallManager1>
 </NetworkConfiguration>`;
 
   const h = withMockFetch(async () => {
-    const nc = await getNetworkConfiguration("192.168.125.178");
+    const nc = await getNetworkConfiguration("198.51.100.178");
     assert.equal(nc.hostName, "SEP001122334455");
-    assert.equal(nc.ipAddress, "192.168.125.178");
+    assert.equal(nc.ipAddress, "198.51.100.178");
     assert.equal(nc.subNetMask, "255.255.255.0");
-    assert.equal(nc.defaultRouter1, "192.168.125.1");
+    assert.equal(nc.defaultRouter1, "198.51.100.1");
     assert.equal(nc.domainName, "example.com");
     assert.equal(nc.dnsServer1, "8.8.8.8");
     assert.equal(nc.dnsServer2, "8.8.4.4");
-    assert.equal(nc.tftpServer1, "192.168.125.10");
-    assert.equal(nc.callManager1, "192.168.125.10");
+    assert.equal(nc.tftpServer1, "198.51.100.10");
+    assert.equal(nc.callManager1, "198.51.100.10");
   });
 
   await h.run(async (url) => {
@@ -114,7 +117,7 @@ test("phone: getNetworkConfiguration parses NetworkConfigurationX XML", async ()
 test("phone: getNetworkConfiguration throws on HTTP 500", async () => {
   const h = withMockFetch(async () => {
     await assert.rejects(
-      () => getNetworkConfiguration("192.168.125.178"),
+      () => getNetworkConfiguration("198.51.100.178"),
       (err: any) => {
         assert.equal(err.name, "PhoneCommandError");
         assert.equal(err.code, "PHONE_COMMAND");
@@ -137,21 +140,21 @@ test("phone: getPortInformation parses PortInformationX XML", async () => {
 <PortInformation>
   <PortSpeed>1000-Full</PortSpeed>
   <CDPNeighborDeviceId>switch01.example.com</CDPNeighborDeviceId>
-  <CDPNeighborIP>192.168.125.1</CDPNeighborIP>
+  <CDPNeighborIP>198.51.100.1</CDPNeighborIP>
   <CDPNeighborPort>GigabitEthernet1/0/5</CDPNeighborPort>
   <LLDPNeighborDeviceId>switch01</LLDPNeighborDeviceId>
-  <LLDPNeighborIP>192.168.125.1</LLDPNeighborIP>
+  <LLDPNeighborIP>198.51.100.1</LLDPNeighborIP>
   <LLDPNeighborPort>Gi1/0/5</LLDPNeighborPort>
 </PortInformation>`;
 
   const h = withMockFetch(async () => {
-    const pi = await getPortInformation("192.168.125.178");
+    const pi = await getPortInformation("198.51.100.178");
     assert.equal(pi.portSpeed, "1000-Full");
     assert.equal(pi.cdpNeighborDeviceId, "switch01.example.com");
-    assert.equal(pi.cdpNeighborIp, "192.168.125.1");
+    assert.equal(pi.cdpNeighborIp, "198.51.100.1");
     assert.equal(pi.cdpNeighborPort, "GigabitEthernet1/0/5");
     assert.equal(pi.lldpNeighborDeviceId, "switch01");
-    assert.equal(pi.lldpNeighborIp, "192.168.125.1");
+    assert.equal(pi.lldpNeighborIp, "198.51.100.1");
     assert.equal(pi.lldpNeighborPort, "Gi1/0/5");
   });
 
@@ -166,7 +169,7 @@ test("phone: getPortInformation parses PortInformationX XML", async () => {
 test("phone: getPortInformation throws on HTTP 401", async () => {
   const h = withMockFetch(async () => {
     await assert.rejects(
-      () => getPortInformation("192.168.125.178"),
+      () => getPortInformation("198.51.100.178"),
       (err: any) => {
         assert.equal(err.name, "PhoneAuthError");
         assert.equal(err.code, "PHONE_AUTH");

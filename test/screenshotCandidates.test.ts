@@ -6,7 +6,7 @@ import { withMockFetch, responseBytes } from "./helpers.js";
 import { getScreenshotAuto } from "../src/phone.js";
 
 test("phone: getScreenshotAuto tries https first for Cisco 98xx model hint", async () => {
-  const host = "192.168.125.178";
+  const host = "198.51.100.178";
   const bytes = new Uint8Array([1, 2, 3]);
 
   const h = withMockFetch(async () => {

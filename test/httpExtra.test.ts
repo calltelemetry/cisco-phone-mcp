@@ -10,7 +10,7 @@ import { httpPostForm, httpGetBytes, getDefaultAuth, normalizeTarget } from "../
 test("http: httpPostForm sends form-urlencoded POST with auth", async () => {
   const h = withMockFetch(async ({ calls }) => {
     const resp = await httpPostForm(
-      "192.168.125.178",
+      "198.51.100.178",
       "/CGI/Execute",
       { XML: "<test>hello</test>", foo: "bar" },
       { auth: { username: "admin", password: "pass" } }
@@ -46,7 +46,7 @@ test("http: httpPostForm with no auth omits authorization header", async () => {
 
   try {
     const h = withMockFetch(async ({ calls }) => {
-      await httpPostForm("192.168.125.178", "/test", { key: "val" });
+      await httpPostForm("198.51.100.178", "/test", { key: "val" });
       const init = calls[0].init;
       assert.equal(init.headers?.authorization, undefined);
     });
@@ -64,7 +64,7 @@ test("http: httpPostForm with no auth omits authorization header", async () => {
 
 test("http: httpPostForm captures response headers lowercase", async () => {
   const h = withMockFetch(async () => {
-    const resp = await httpPostForm("192.168.125.178", "/test", { a: "b" });
+    const resp = await httpPostForm("198.51.100.178", "/test", { a: "b" });
     assert.equal(resp.headers["x-custom"], "hello");
   });
 
@@ -79,7 +79,7 @@ test("http: httpGetBytes returns binary data with correct headers", async () => 
   const bytes = new Uint8Array([0xff, 0xd8, 0xff, 0xe0]);
 
   const h = withMockFetch(async () => {
-    const resp = await httpGetBytes("192.168.125.178", "/CGI/Screenshot");
+    const resp = await httpGetBytes("198.51.100.178", "/CGI/Screenshot");
     assert.equal(resp.status, 200);
     assert.equal(resp.headers["content-type"], "image/jpeg");
     assert.deepEqual(Array.from(resp.body), [0xff, 0xd8, 0xff, 0xe0]);
@@ -92,7 +92,7 @@ test("http: httpGetBytes returns binary data with correct headers", async () => 
 
 test("http: httpGetBytes handles error status codes", async () => {
   const h = withMockFetch(async () => {
-    const resp = await httpGetBytes("192.168.125.178", "/CGI/Screenshot");
+    const resp = await httpGetBytes("198.51.100.178", "/CGI/Screenshot");
     assert.equal(resp.status, 403);
     assert.equal(resp.body.length, 0);
   });
@@ -106,7 +106,7 @@ test("http: httpGetBytes with auth", async () => {
   const bytes = new Uint8Array([1, 2, 3]);
 
   const h = withMockFetch(async ({ calls }) => {
-    await httpGetBytes("192.168.125.178", "/test", {
+    await httpGetBytes("198.51.100.178", "/test", {
       auth: { username: "user", password: "secret" },
     });
     const authHeader = calls[0].init.headers?.authorization;
@@ -169,7 +169,7 @@ test("http: getDefaultAuth uses PHONE_USER/PHONE_PASS aliases", () => {
 // --- normalizeTarget edge cases ---
 
 test("http: normalizeTarget handles PhoneTarget object passthrough", () => {
-  const target = { host: "phone.local", protocol: "https" as const, port: 8443 };
+  const target = { host: "phone.example.com", protocol: "https" as const, port: 8443 };
   const result = normalizeTarget(target);
   assert.deepEqual(result, target);
 });

@@ -8,7 +8,7 @@ All tools accept these common parameters:
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
-| `host` | string | Yes | Phone IP or URL (e.g., `192.168.1.100` or `http://192.168.1.100`) |
+| `host` | string | Yes | Phone IP or URL (e.g., `192.0.2.100` or `http://192.0.2.100`) |
 | `auth` | object | No | Basic auth `{username, password}`. Defaults to env vars |
 
 ## Information Tools
@@ -59,14 +59,14 @@ Get phone network settings.
 ```json
 {
   "hostName": "SEP001122334455",
-  "ipAddress": "192.168.125.178",
+  "ipAddress": "198.51.100.178",
   "subNetMask": "255.255.255.0",
-  "defaultRouter1": "192.168.125.1",
+  "defaultRouter1": "198.51.100.1",
   "domainName": "example.com",
-  "dnsServer1": "192.168.125.10",
+  "dnsServer1": "198.51.100.10",
   "dnsServer2": "8.8.8.8",
-  "tftpServer1": "192.168.125.10",
-  "callManager1": "192.168.125.10"
+  "tftpServer1": "198.51.100.10",
+  "callManager1": "198.51.100.10"
 }
 ```
 
@@ -81,10 +81,10 @@ Get CDP/LLDP neighbor discovery data.
 {
   "portSpeed": "1000 Full",
   "cdpNeighborDeviceId": "switch01.example.com",
-  "cdpNeighborIp": "192.168.125.1",
+  "cdpNeighborIp": "198.51.100.1",
   "cdpNeighborPort": "GigabitEthernet1/0/1",
   "lldpNeighborDeviceId": "switch01",
-  "lldpNeighborIp": "192.168.125.1",
+  "lldpNeighborIp": "198.51.100.1",
   "lldpNeighborPort": "Gi1/0/1"
 }
 ```
@@ -100,8 +100,8 @@ Get primary stream RTP statistics.
 **Returns:**
 ```json
 {
-  "remoteAddrRaw": "192.168.125.100/16384",
-  "localAddrRaw": "192.168.125.178/24576",
+  "remoteAddrRaw": "198.51.100.100/16384",
+  "localAddrRaw": "198.51.100.178/24576",
   "streamStatus": "Active",
   "name": "SEP001122334455",
   "senderPackets": 1500,
@@ -160,8 +160,8 @@ Simplified RTP summary with parsed addresses.
 ```json
 {
   "streamStatus": "Active",
-  "local": { "host": "192.168.125.178", "port": 24576 },
-  "remote": { "host": "192.168.125.100", "port": 16384 },
+  "local": { "host": "198.51.100.178", "port": 24576 },
+  "remote": { "host": "198.51.100.100", "port": 16384 },
   "rxPackets": 1500,
   "txPackets": 1500,
   "lostPackets": 0,
@@ -185,7 +185,7 @@ Send raw CiscoIPPhoneExecute commands.
 **Example:**
 ```json
 {
-  "host": "192.168.125.178",
+  "host": "198.51.100.178",
   "urls": ["Key:Speaker", "Dial:9000"]
 }
 ```
@@ -231,7 +231,7 @@ Convenience wrapper for dialing.
 **Example:**
 ```json
 {
-  "host": "192.168.125.178",
+  "host": "198.51.100.178",
   "digits": "9005551234"
 }
 ```
@@ -310,8 +310,8 @@ Auto-detect screenshot path based on phone model.
   "contentType": "image/bmp",
   "bytes": 45678,
   "file": "/tmp/phone-screenshot.bmp",
-  "usedUrl": "http://192.168.125.178/CGI/lcd.bmp",
-  "attempted": ["http://192.168.125.178/CGI/lcd.bmp"]
+  "usedUrl": "http://198.51.100.178/CGI/lcd.bmp",
+  "attempted": ["http://198.51.100.178/CGI/lcd.bmp"]
 }
 ```
 

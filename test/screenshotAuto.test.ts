@@ -7,7 +7,7 @@ import { getScreenshotAuto } from "../src/phone.js";
 
 test("phone: getScreenshotAuto stops after 401 when auth missing", async () => {
   const h = withMockFetch(async ({ calls }) => {
-    const res = await getScreenshotAuto("192.168.125.178");
+    const res = await getScreenshotAuto("198.51.100.178");
     assert.equal(res.status, 401);
     assert.equal(calls.length, 1);
   });

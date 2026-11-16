@@ -45,6 +45,11 @@ jobs:
       - name: Install dependencies
         run: yarn install --immutable
 
+      # Public repo: every tracked file is a disclosure channel. Internal
+      # addresses and hostnames fail here; RFC 5737 ranges are allowed.
+      - name: Source scan for internal identifiers
+        run: yarn scrub:source
+
       - name: Type check
         run: yarn typecheck
 
@@ -58,3 +63,15 @@ jobs:
           name: coverage-node-${{ matrix.node-version }}
           path: coverage/
           retention-days: 1
+
+      - name: Build
+        run: yarn build
+
+      # Scans exactly what `npm pack` would ship (build output included).
+      - name: Publish scrub gate
+        run: yarn scrub:publish
+
+      # Proves the package packs and passes npm's publish-time checks on every
+      # PR and merge-queue run, without touching the registry or any credential.
+      - name: Publish dry run
+        run: npm publish --dry-run --ignore-scripts --access public --provenance=false

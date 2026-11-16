@@ -69,7 +69,7 @@ const authSchema = z
   .optional();
 
 const targetSchema = z.object({
-  host: z.string().describe("Phone host or URL (e.g. 192.168.125.178 or http://...)"),
+  host: z.string().describe("Phone host or URL (e.g. 198.51.100.178 or http://...)"),
   auth: authSchema.describe(
     "Optional basic auth (overrides PHONE_USERNAME/PHONE_PASSWORD env defaults). " +
     "Set tlsInsecure: true for self-signed certs."

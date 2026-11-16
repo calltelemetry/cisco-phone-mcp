@@ -88,7 +88,7 @@ Authentication is optional — many phones allow unauthenticated access to info 
 Check if a phone is reachable.
 
 ```json
-{ "host": "192.168.1.100" }
+{ "host": "192.0.2.100" }
 ```
 
 Returns HTTP status code and content type.
@@ -98,7 +98,7 @@ Returns HTTP status code and content type.
 Query `/DeviceInformationX` — model name, serial number, MAC address, firmware version, hardware revision.
 
 ```json
-{ "host": "192.168.1.100" }
+{ "host": "192.0.2.100" }
 ```
 
 ### `get_network_configuration`
@@ -126,7 +126,7 @@ Query `/StreamingStatisticsX` for real-time RTP media statistics:
 Query a specific stream (0-4) via the Serviceability HTML endpoint:
 
 ```json
-{ "host": "192.168.1.100", "streamIndex": 0 }
+{ "host": "192.0.2.100", "streamIndex": 0 }
 ```
 
 ### `get_streaming_statistics_all_streams`
@@ -138,7 +138,7 @@ Returns all 5 streams — useful for conference calls or shared lines.
 Initiate a call from the phone:
 
 ```json
-{ "host": "192.168.1.100", "digits": "9005551234" }
+{ "host": "192.0.2.100", "digits": "9005551234" }
 ```
 
 Sends `Key:Speaker` (activates speakerphone) then `Dial:<digits>` via `/CGI/Execute`. Set `speaker: false` to skip the speaker activation.
@@ -152,7 +152,7 @@ End the active call by sending `Key:EndCall` (default: 2 presses).
 Send arbitrary `CiscoIPPhoneExecute` commands:
 
 ```json
-{ "host": "192.168.1.100", "urls": ["Key:Services", "Key:Soft1"] }
+{ "host": "192.0.2.100", "urls": ["Key:Services", "Key:Soft1"] }
 ```
 
 ### `screenshot` / `screenshot_auto`
@@ -164,7 +164,7 @@ Capture the phone display as an image file. `screenshot_auto` tries multiple end
 Fetch any phone HTTP endpoint:
 
 ```json
-{ "host": "192.168.1.100", "path": "/StreamingStatisticsX?2" }
+{ "host": "192.0.2.100", "path": "/StreamingStatisticsX?2" }
 ```
 
 ## Supported Phone Models
@@ -184,10 +184,10 @@ Fetch any phone HTTP endpoint:
 
 ```
 # Before call
-stats_before = mcp__phone__get_rtp_stats({ host: "192.168.1.100" })
+stats_before = mcp__phone__get_rtp_stats({ host: "192.0.2.100" })
 
 # After audio injection
-stats_after = mcp__phone__get_rtp_stats({ host: "192.168.1.100" })
+stats_after = mcp__phone__get_rtp_stats({ host: "192.0.2.100" })
 
 # Compare rxPackets — if delta > 0, audio was received
 ```
@@ -195,15 +195,15 @@ stats_after = mcp__phone__get_rtp_stats({ host: "192.168.1.100" })
 ### Remote dial and screenshot
 
 ```
-mcp__phone__dial({ host: "192.168.1.100", digits: "9005551234" })
+mcp__phone__dial({ host: "192.0.2.100", digits: "9005551234" })
 # Wait for call to connect...
-mcp__phone__screenshot_auto({ host: "192.168.1.100" })
+mcp__phone__screenshot_auto({ host: "192.0.2.100" })
 ```
 
 ### Check call quality during a call
 
 ```
-mcp__phone__get_rtp_stats({ host: "192.168.1.100" })
+mcp__phone__get_rtp_stats({ host: "192.0.2.100" })
 # Returns: jitter, MOS score, packet loss, codec info
 ```
 
@@ -225,10 +225,10 @@ The server communicates directly with phones over HTTP (or HTTPS for 98xx). No C
 A built-in CLI is included for quick manual checks (from source checkout):
 
 ```bash
-npx tsx src/cli.ts device --host 192.168.1.100
-npx tsx src/cli.ts network --host 192.168.1.100
-npx tsx src/cli.ts port --host 192.168.1.100
-npx tsx src/cli.ts rtp --host 192.168.1.100
+npx tsx src/cli.ts device --host 192.0.2.100
+npx tsx src/cli.ts network --host 192.0.2.100
+npx tsx src/cli.ts port --host 192.0.2.100
+npx tsx src/cli.ts rtp --host 192.0.2.100
 ```
 
 ## Development
