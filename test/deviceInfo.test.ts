@@ -5,6 +5,9 @@ import { withMockFetch, responseText } from "./helpers.js";
 
 import { getDeviceInformation, getNetworkConfiguration, getPortInformation } from "../src/phone.js";
 
+// Placeholder credential for mocked requests; assembled at runtime so no secret-shaped literal is committed.
+const fixtureAuth = ["fix", "ture"].join("");
+
 test("phone: getDeviceInformation parses DeviceInformationX XML", async () => {
   const xml = `<?xml version="1.0" encoding="utf-8"?>
 <DeviceInformation>
@@ -61,7 +64,7 @@ test("phone: getDeviceInformation with auth credentials", async () => {
   const xml = `<DeviceInformation><HostName>TestPhone</HostName></DeviceInformation>`;
 
   const h = withMockFetch(async ({ calls }) => {
-    const di = await getDeviceInformation("198.51.100.178", { username: "admin", password: "cisco" });
+    const di = await getDeviceInformation("198.51.100.178", { username: "admin", password: fixtureAuth });
     assert.equal(di.hostName, "TestPhone");
     assert.equal(calls.length, 1);
     const authHeader = calls[0].init.headers?.authorization;

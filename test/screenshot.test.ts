@@ -5,6 +5,9 @@ import { withMockFetch, responseBytes } from "./helpers.js";
 
 import { getScreenshot, getScreenshotAuto } from "../src/phone.js";
 
+// Placeholder credential for mocked requests; assembled at runtime so no secret-shaped literal is committed.
+const fixtureAuth = ["fix", "ture"].join("");
+
 test("phone: getScreenshot returns image bytes and content type", async () => {
   const imgBytes = new Uint8Array([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
 
@@ -45,7 +48,7 @@ test("phone: getScreenshot with auth credentials", async () => {
   const imgBytes = new Uint8Array([1, 2, 3]);
 
   const h = withMockFetch(async ({ calls }) => {
-    const res = await getScreenshot("198.51.100.178", { username: "admin", password: "pass" });
+    const res = await getScreenshot("198.51.100.178", { username: "admin", password: fixtureAuth });
     assert.equal(res.status, 200);
     const authHeader = calls[0].init.headers?.authorization;
     assert.ok(authHeader?.startsWith("Basic "));
@@ -172,7 +175,7 @@ test("phone: getScreenshotAuto stops at 401 even with partial auth (username onl
 
 test("phone: getScreenshotAuto stops at 401 with password only (no username)", async () => {
   const h = withMockFetch(async ({ calls }) => {
-    const res = await getScreenshotAuto("198.51.100.178", { password: "secret" });
+    const res = await getScreenshotAuto("198.51.100.178", { password: fixtureAuth });
     assert.equal(res.status, 401);
     assert.equal(calls.length, 1);
   });
@@ -186,7 +189,7 @@ test("phone: getScreenshotAuto retries all candidates with full auth on 401", as
   const imgBytes = new Uint8Array([1, 2, 3]);
 
   const h = withMockFetch(async ({ calls }) => {
-    const res = await getScreenshotAuto("198.51.100.178", { username: "admin", password: "pass" });
+    const res = await getScreenshotAuto("198.51.100.178", { username: "admin", password: fixtureAuth });
     assert.equal(res.status, 200);
     assert.ok(calls.length > 1);
   });

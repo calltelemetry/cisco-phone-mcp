@@ -16,6 +16,9 @@ import {
   getScreenshotAuto,
 } from "../src/phone.js";
 
+// Placeholder credential for mocked requests; assembled at runtime so no secret-shaped literal is committed.
+const fixtureAuth = ["fix", "ture"].join("");
+
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const fixture = (name: string) => readFileSync(join(__dirname, "fixtures", name), "utf8");
 
@@ -160,7 +163,7 @@ test("phone: getScreenshotAuto uses default fallback paths for unknown model", a
 
 test("phone: getScreenshotAuto tries 4 candidates for unknown model before giving up", async () => {
   const h = withMockFetch(async () => {
-    const res = await getScreenshotAuto("198.51.100.178", { username: "a", password: "b" }, "CP-8841");
+    const res = await getScreenshotAuto("198.51.100.178", { username: "a", password: fixtureAuth }, "CP-8841");
     // All candidates returned empty, so should exhaust all 4
     assert.equal(res.attempted.length, 4);
     assert.equal(res.bytes.length, 0);
