@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <StreamingStatistics>
-  <RemoteAddr>192.168.125.10/20000</RemoteAddr>
-  <LocalAddr>192.168.125.178/34567</LocalAddr>
+  <RemoteAddr>198.51.100.10/20000</RemoteAddr>
+  <LocalAddr>198.51.100.178/34567</LocalAddr>
   <StreamStatus>Active</StreamStatus>
   <Name>SEP001122334455</Name>
   <SenderPackets>111</SenderPackets>

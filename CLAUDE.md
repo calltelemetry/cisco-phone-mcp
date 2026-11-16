@@ -15,8 +15,8 @@ yarn build
 yarn start
 
 # CLI testing
-yarn cli device --host 192.168.125.178
-yarn cli rtp --host 192.168.125.178
+yarn cli device --host 198.51.100.178
+yarn cli rtp --host 198.51.100.178
 ```
 
 ## Project Structure
@@ -150,7 +150,7 @@ Initiate call from physical phone:
 
 ```typescript
 await mcp__phone__dial({
-  host: "192.168.1.100",
+  host: "192.0.2.100",
   digits: "9005551234"
 });
 ```
@@ -179,7 +179,7 @@ await mcp__phone__dial({
 yarn build && yarn test
 
 # Manual testing via CLI
-yarn cli device --host 192.168.125.178
-yarn cli rtp --host 192.168.125.178
+yarn cli device --host 198.51.100.178
+yarn cli rtp --host 198.51.100.178
 ```
 

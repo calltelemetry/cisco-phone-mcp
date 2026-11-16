@@ -10,7 +10,7 @@ test("phone: getStreamingStatisticsAllStreams always returns 5 entries", async (
   const html4 = `<HTML><BODY><B>Stream Status</B><B>Active</B><B>Local Address</B><B>1.2.3.4/4444</B></BODY></HTML>`;
 
   const h = withMockFetch(async () => {
-    const streams = await getStreamingStatisticsAllStreams("192.168.125.178");
+    const streams = await getStreamingStatisticsAllStreams("198.51.100.178");
     assert.equal(streams.length, 5);
     assert.equal(streams[0].streamIndex, 0);
     assert.equal(streams[0].streamStatus, "Active");

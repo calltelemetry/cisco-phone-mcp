@@ -70,7 +70,7 @@ Override default credentials in tool calls:
 
 ```typescript
 await mcp__phone__get_device_information({
-  host: "192.168.1.100",
+  host: "192.0.2.100",
   auth: {
     username: "special-user",
     password: "special-pass"
@@ -149,16 +149,16 @@ The CLI provides quick testing without MCP:
 
 ```bash
 # Device information
-yarn cli device --host 192.168.125.178
+yarn cli device --host 198.51.100.178
 
 # Network configuration
-yarn cli network --host 192.168.125.178
+yarn cli network --host 198.51.100.178
 
 # Port/CDP information
-yarn cli port --host 192.168.125.178
+yarn cli port --host 198.51.100.178
 
 # RTP statistics
-yarn cli rtp --host 192.168.125.178
+yarn cli rtp --host 198.51.100.178
 ```
 
 ## Debugging
@@ -173,13 +173,13 @@ DEBUG=* yarn start
 
 ```bash
 # Basic connectivity
-curl -v http://192.168.125.178/
+curl -v http://198.51.100.178/
 
 # Device info (no auth)
-curl http://192.168.125.178/DeviceInformationX
+curl http://198.51.100.178/DeviceInformationX
 
 # Device info (with auth)
-curl -u admin:password http://192.168.125.178/DeviceInformationX
+curl -u admin:password http://198.51.100.178/DeviceInformationX
 ```
 
 ### Manual MCP Testing
@@ -189,7 +189,7 @@ curl -u admin:password http://192.168.125.178/DeviceInformationX
 echo '{"jsonrpc":"2.0","id":1,"method":"tools/list","params":{}}' | yarn start
 
 # Call a tool
-echo '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"health","arguments":{"host":"192.168.125.178"}}}' | yarn start
+echo '{"jsonrpc":"2.0","id":1,"method":"tools/call","params":{"name":"health","arguments":{"host":"198.51.100.178"}}}' | yarn start
 ```
 
 ## Timeouts
@@ -198,7 +198,7 @@ Default timeout is 10 seconds. Override per-request:
 
 ```typescript
 await mcp__phone__health({
-  host: "192.168.1.100",
+  host: "192.0.2.100",
   timeoutMs: 5000  // 5 seconds
 });
 ```

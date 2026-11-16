@@ -82,9 +82,9 @@ yarn start
 ### CLI Testing
 
 ```bash
-yarn cli device --host 192.168.125.178
-yarn cli network --host 192.168.125.178
-yarn cli rtp --host 192.168.125.178
+yarn cli device --host 198.51.100.178
+yarn cli network --host 198.51.100.178
+yarn cli rtp --host 198.51.100.178
 ```
 
 ### Claude Code Integration
@@ -156,10 +156,10 @@ Verify BIB greeting was received by checking RTP packet counts:
 
 ```typescript
 // Before call
-const baseline = await mcp__phone__get_rtp_stats({ host: "192.168.1.100" });
+const baseline = await mcp__phone__get_rtp_stats({ host: "192.0.2.100" });
 
 // After audio injection
-const after = await mcp__phone__get_rtp_stats({ host: "192.168.1.100" });
+const after = await mcp__phone__get_rtp_stats({ host: "192.0.2.100" });
 
 // Check packet increase
 const delta = after.rxPackets - baseline.rxPackets;
@@ -174,7 +174,7 @@ Initiate a call from a physical phone:
 
 ```typescript
 await mcp__phone__dial({
-  host: "192.168.1.100",
+  host: "192.0.2.100",
   digits: "9005551234"
 });
 ```
@@ -185,7 +185,7 @@ Get phone details for troubleshooting:
 
 ```typescript
 const info = await mcp__phone__get_device_information({
-  host: "192.168.1.100"
+  host: "192.0.2.100"
 });
 console.log(`Model: ${info.modelNumber}, MAC: ${info.macAddress}`);
 ```

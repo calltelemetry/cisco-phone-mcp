@@ -27,7 +27,7 @@ test("ciscoXml: parseCiscoXml parses DeviceInformation fixture", () => {
 
 test("ciscoXml: parseCiscoXml parses NetworkConfiguration fixture", () => {
   const parsed = parseCiscoXml(fixture("networkConfiguration.xml")) as any;
-  assert.equal(parsed.NetworkConfiguration.IPAddress, "192.168.125.178");
+  assert.equal(parsed.NetworkConfiguration.IPAddress, "198.51.100.178");
   assert.equal(parsed.NetworkConfiguration.DNSServer1, "8.8.8.8");
 });
 
@@ -139,9 +139,9 @@ test("ciscoXml: asInt handles boolean true (via asString -> '1')", () => {
 // --- parseIpPort ---
 
 test("ciscoXml: parseIpPort handles host/port", () => {
-  assert.deepEqual(parseIpPort("192.168.1.10/16384"), { host: "192.168.1.10", port: 16384 });
+  assert.deepEqual(parseIpPort("192.0.2.10/16384"), { host: "192.0.2.10", port: 16384 });
   assert.deepEqual(parseIpPort("0.0.0.0/0"), { host: "0.0.0.0", port: 0 });
-  assert.deepEqual(parseIpPort("10.0.0.1"), { host: "10.0.0.1", port: null });
+  assert.deepEqual(parseIpPort("203.0.113.1"), { host: "203.0.113.1", port: null });
   assert.equal(parseIpPort(null), null);
 });
 
@@ -150,13 +150,13 @@ test("ciscoXml: parseIpPort returns null for empty string", () => {
 });
 
 test("ciscoXml: parseIpPort handles non-numeric port", () => {
-  const result = parseIpPort("10.0.0.1/abc");
-  assert.equal(result?.host, "10.0.0.1");
+  const result = parseIpPort("203.0.113.1/abc");
+  assert.equal(result?.host, "203.0.113.1");
   assert.equal(result?.port, null);
 });
 
 test("ciscoXml: parseIpPort handles whitespace in host", () => {
-  const result = parseIpPort("  10.0.0.1  /16384");
-  assert.equal(result?.host, "10.0.0.1");
+  const result = parseIpPort("  203.0.113.1  /16384");
+  assert.equal(result?.host, "203.0.113.1");
   assert.equal(result?.port, 16384);
 });

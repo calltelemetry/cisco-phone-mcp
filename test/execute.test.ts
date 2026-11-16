@@ -14,7 +14,7 @@ test("phone: executePhoneCommand sends CiscoIPPhoneExecute XML (escapes URL attr
   ];
 
   const h = withMockFetch(async () => {
-    const resp = await executePhoneCommand("192.168.125.178", urls, undefined, "/CGI/Execute");
+    const resp = await executePhoneCommand("198.51.100.178", urls, undefined, "/CGI/Execute");
     assert.equal(resp.status, 200);
   });
 

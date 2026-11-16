@@ -9,7 +9,7 @@ test("phone: getScreenshot returns image bytes and content type", async () => {
   const imgBytes = new Uint8Array([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
 
   const h = withMockFetch(async () => {
-    const res = await getScreenshot("192.168.125.178");
+    const res = await getScreenshot("198.51.100.178");
     assert.equal(res.status, 200);
     assert.equal(res.contentType, "image/png");
     assert.deepEqual(Array.from(res.bytes), Array.from(imgBytes));
@@ -27,7 +27,7 @@ test("phone: getScreenshot returns BMP for 79xx phones", async () => {
   const bmpBytes = new Uint8Array([0x42, 0x4d, 0x00, 0x00]);
 
   const h = withMockFetch(async () => {
-    const res = await getScreenshot("192.168.125.178", undefined, "/CGI/Screenshot");
+    const res = await getScreenshot("198.51.100.178", undefined, "/CGI/Screenshot");
     assert.equal(res.status, 200);
     assert.equal(res.contentType, "image/bmp");
     assert.deepEqual(Array.from(res.bytes), Array.from(bmpBytes));
@@ -45,7 +45,7 @@ test("phone: getScreenshot with auth credentials", async () => {
   const imgBytes = new Uint8Array([1, 2, 3]);
 
   const h = withMockFetch(async ({ calls }) => {
-    const res = await getScreenshot("192.168.125.178", { username: "admin", password: "pass" });
+    const res = await getScreenshot("198.51.100.178", { username: "admin", password: "pass" });
     assert.equal(res.status, 200);
     const authHeader = calls[0].init.headers?.authorization;
     assert.ok(authHeader?.startsWith("Basic "));
@@ -61,7 +61,7 @@ test("phone: getScreenshot with auth credentials", async () => {
 
 test("phone: getScreenshot handles HTTP error", async () => {
   const h = withMockFetch(async () => {
-    const res = await getScreenshot("192.168.125.178");
+    const res = await getScreenshot("198.51.100.178");
     assert.equal(res.status, 403);
     assert.equal(res.bytes.length, 0);
   });
@@ -75,7 +75,7 @@ test("phone: getScreenshotAuto tries 39xx lcd.bmp path", async () => {
   const imgBytes = new Uint8Array([0x42, 0x4d, 0x01, 0x02]);
 
   const h = withMockFetch(async ({ calls }) => {
-    const res = await getScreenshotAuto("192.168.125.178", undefined, "Cisco 3905");
+    const res = await getScreenshotAuto("198.51.100.178", undefined, "Cisco 3905");
     assert.equal(res.status, 200);
     assert.ok(res.usedUrl.includes("/CGI/lcd.bmp"));
     assert.equal(calls.length, 1);
@@ -93,7 +93,7 @@ test("phone: getScreenshotAuto tries 69xx lcd.bmp path", async () => {
   const imgBytes = new Uint8Array([0x42, 0x4d, 0x03, 0x04]);
 
   const h = withMockFetch(async ({ calls }) => {
-    const res = await getScreenshotAuto("192.168.125.178", undefined, "Cisco 6961");
+    const res = await getScreenshotAuto("198.51.100.178", undefined, "Cisco 6961");
     assert.equal(res.status, 200);
     assert.ok(res.usedUrl.includes("/CGI/lcd.bmp"));
     assert.equal(calls.length, 1);
@@ -111,9 +111,9 @@ test("phone: getScreenshotAuto tries CP-98xx prefix (https first)", async () => 
   const imgBytes = new Uint8Array([1, 2, 3]);
 
   const h = withMockFetch(async () => {
-    const res = await getScreenshotAuto("192.168.125.178", undefined, "CP-9851");
+    const res = await getScreenshotAuto("198.51.100.178", undefined, "CP-9851");
     assert.equal(res.status, 200);
-    assert.equal(res.attempted[0], "https://192.168.125.178/CGI/Screenshot");
+    assert.equal(res.attempted[0], "https://198.51.100.178/CGI/Screenshot");
   });
 
   await h.run(async (url) => {
@@ -128,7 +128,7 @@ test("phone: getScreenshotAuto tries CP-39xx prefix", async () => {
   const imgBytes = new Uint8Array([1, 2]);
 
   const h = withMockFetch(async () => {
-    const res = await getScreenshotAuto("192.168.125.178", undefined, "CP-3905");
+    const res = await getScreenshotAuto("198.51.100.178", undefined, "CP-3905");
     assert.equal(res.status, 200);
     assert.ok(res.usedUrl.includes("/CGI/lcd.bmp"));
   });
@@ -145,7 +145,7 @@ test("phone: getScreenshotAuto tries CP-69xx prefix", async () => {
   const imgBytes = new Uint8Array([1, 2]);
 
   const h = withMockFetch(async () => {
-    const res = await getScreenshotAuto("192.168.125.178", undefined, "CP-6961");
+    const res = await getScreenshotAuto("198.51.100.178", undefined, "CP-6961");
     assert.equal(res.status, 200);
     assert.ok(res.usedUrl.includes("/CGI/lcd.bmp"));
   });
@@ -160,7 +160,7 @@ test("phone: getScreenshotAuto tries CP-69xx prefix", async () => {
 
 test("phone: getScreenshotAuto stops at 401 even with partial auth (username only)", async () => {
   const h = withMockFetch(async ({ calls }) => {
-    const res = await getScreenshotAuto("192.168.125.178", { username: "admin" });
+    const res = await getScreenshotAuto("198.51.100.178", { username: "admin" });
     assert.equal(res.status, 401);
     assert.equal(calls.length, 1);
   });
@@ -172,7 +172,7 @@ test("phone: getScreenshotAuto stops at 401 even with partial auth (username onl
 
 test("phone: getScreenshotAuto stops at 401 with password only (no username)", async () => {
   const h = withMockFetch(async ({ calls }) => {
-    const res = await getScreenshotAuto("192.168.125.178", { password: "secret" });
+    const res = await getScreenshotAuto("198.51.100.178", { password: "secret" });
     assert.equal(res.status, 401);
     assert.equal(calls.length, 1);
   });
@@ -186,7 +186,7 @@ test("phone: getScreenshotAuto retries all candidates with full auth on 401", as
   const imgBytes = new Uint8Array([1, 2, 3]);
 
   const h = withMockFetch(async ({ calls }) => {
-    const res = await getScreenshotAuto("192.168.125.178", { username: "admin", password: "pass" });
+    const res = await getScreenshotAuto("198.51.100.178", { username: "admin", password: "pass" });
     assert.equal(res.status, 200);
     assert.ok(calls.length > 1);
   });
@@ -204,7 +204,7 @@ test("phone: getScreenshotAuto retries all candidates with full auth on 401", as
 
 test("phone: getScreenshotAuto returns 500 when all candidates fail with status 0", async () => {
   const h = withMockFetch(async () => {
-    const res = await getScreenshotAuto("192.168.125.178", undefined, null);
+    const res = await getScreenshotAuto("198.51.100.178", undefined, null);
     assert.equal(res.bytes.length, 0);
     assert.equal(res.attempted.length, 4);
   });
@@ -218,7 +218,7 @@ test("phone: getScreenshotAuto with null modelHint uses default candidates", asy
   const imgBytes = new Uint8Array([1, 2, 3]);
 
   const h = withMockFetch(async () => {
-    const res = await getScreenshotAuto("192.168.125.178", undefined, null);
+    const res = await getScreenshotAuto("198.51.100.178", undefined, null);
     assert.equal(res.status, 200);
     assert.ok(res.usedUrl.includes("/CGI/Screenshot"));
   });
@@ -235,7 +235,7 @@ test("phone: getScreenshotAuto with empty string modelHint uses default candidat
   const imgBytes = new Uint8Array([5, 6, 7]);
 
   const h = withMockFetch(async () => {
-    const res = await getScreenshotAuto("192.168.125.178", undefined, "  ");
+    const res = await getScreenshotAuto("198.51.100.178", undefined, "  ");
     assert.equal(res.status, 200);
     assert.ok(res.attempted.length > 0);
   });

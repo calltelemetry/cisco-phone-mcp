@@ -19,6 +19,8 @@
     "cli": "tsx src/cli.ts",
     "test": "tsx --test test/*.test.ts",
     "test:coverage": "npx c8 --reporter=lcov --reporter=text tsx --test test/*.test.ts",
+    "scrub:source": "node scripts/source-scan.mjs",
+    "scrub:publish": "node scripts/publish-scrub.mjs",
     "prepack": "npm run build && npm test"
   },
   "keywords": [
